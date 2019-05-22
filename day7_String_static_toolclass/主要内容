@@ -1,0 +1,96 @@
+1.String类
+2.static静态关键字
+3.Arrays工具类
+4.Math数学工具类
+
+
+一.String类
+    概述:
+        1.字符串的内容永不可变
+        2.字符串可以共享使用
+        3.字符串相当于是char[]类型，底层是byte[]字节数组
+
+    构造方法和直接创建:
+        1.public String()
+            创建一个空白字符串，里面什么都没有  String str = new String()
+        2.public String(char[] array)
+            可以把字符数组放作为参数，然后根据字符数组创建一个字符串
+        3.public String(byte[] array)
+            可以把字节数组作为参数，然后根据字节数组粗创建一个字符串
+        4.直接创建: String str = "xxx"
+
+    字符串的常量池:
+        字符串有个常量池，底层是字节，会有内存地址保存着
+        如果直接创建字符串，那么字符串的内存地址会去常量池里面寻找，这样就不需要额外内存
+        如果是用构造方法创建字符串，那字符串会在堆中创建新的内存
+        所以如果用 == 比较的话，引用类型的==比较的是内存地址，所以构造方法和直接创建字符串==比较会出现false，因为内存地址不一样
+
+    字符串的比较方法:
+        1.public boolean equals(Object obj):
+            参数可以是任何对象，只有参数是和调用对象的字符串相同才会返回true
+            str.equals(str1)    相当于用str和str1比较，但是只比较内容，相同就返回true
+        2.public boolean equalsIgnoreCase(String str):
+            也是字符串的内容比较，但是忽略大小写
+        3. ==
+            引用类型的比较是地址的比较，基本数据类型的比较是值的比较
+
+    字符串的获取方法:
+        1. public int length():
+            str.length()    获取字符串的长度
+        2. public String concat(String str):
+            str.concat(str1)    把str1拼接在str字符串后面，返回新的字符串
+        3. public char charAt(int index):
+            str.charAt(index)     根据索引值找到对应的字符
+        4. public int indexOf(String str):
+            str.indexOf(需要寻找的str)   根据给出的str找到当前字符串中第一次出现的索引位置，如果没有的话就返回-1
+
+    字符串的截取方法:
+        1. public String substring(int index):
+            str.substring(index) 从当前给出的索引开始截取一直到结尾，返回新的字符串
+        2. public String substring(int begin, int end):
+            根据begin和end截取相应的字符串
+
+    字符串的转换方法:
+        1. public char[] toCharArray():
+            把当前字符串拆分成字符数组返回
+        2. public byte[] getBytes():
+            把当前字符串拆分成字符数组返回
+        3. public String replace(CharSequence oldString, CharSequence newString):
+            把就的字符串换成新的
+
+    字符串的分割方法:
+        1.public String[] split(String regex)：
+            根据给出的正则表达式把字符串切分出来变成字符数组
+
+
+二.static关键字
+    用了static就属于类，不属于对象。就是创建对象的时候，如果用一个对象一改就类中的全都改
+    用了static的属性相当于类属性，用于方法就称为静态方法，可以直接用类访问这个方法
+    static 的变量叫静态变量，方法叫静态方法，可以直接用类名称访问
+    类名称.静态变量
+    类名称.静态方法()
+    注意:1.静态不能访问非静态
+         2.静态方法不能又this关键字
+    静态代码块：
+    static {
+        代码块内容
+    }
+    首次创建类的时候，会执行静态代码块的内容，并且只执行一次
+
+三.Arrays工具类
+    用于数组的工具类
+    1. public static String toString(数组)
+        Arrays.toString(数组)  返回值是字符串。把数组按照默认格式变成字符串
+    2. public static void sort(数组)
+        Arrays.sort(数组)  没有返回值，在数组上默认为升序排序
+
+
+四.Math工具类
+    1.public static double abs(double num)
+        Math.abs()  返回double值,获取绝对值
+    2.public static double ceil(double num)
+        Math.ceil() 返回double值，向上取整，只会取整整数，比如31.9就变成32.0
+    3.public static double floor(double num)
+        Math.floor()    向下取整，只会取整数，比如31.9变成31.0
+    4.public static long round(double num)
+        Math.round() 返回long值   四舍五入

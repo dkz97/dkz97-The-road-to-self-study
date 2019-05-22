@@ -1,0 +1,62 @@
+1. 线程池
+2. lambda表达式
+
+
+
+
+一.线程池
+    创建一个可以容纳线程的容器，然后把线程放在容器里面，用线程的时候就把线程从容器里面拿出来，用完了之后就把线程放回去。
+
+    jdk1.5之前是使用LinkedList<Thread> 来实行的
+    1.先把线程存在LinkedList集合中，
+    2.使用的时候就用removeFirst() 方法移出线程，获取线程
+    3.获取线程之后start()使用
+    4.使用完之后addLast()放回去
+
+    jdk1.5之后就提供了线程池的封装类，可以直接用线程池的封装类实现
+    Java里面线程池的顶级接口是 java.util.concurrent.Executor
+    真正的线程池接口是 java.util.concurrent.ExecutorService
+    Executor的工具类是Executors
+
+    java.util.concurrent.Executors:线程池工厂类，用来生成线程池
+    Executors的静态方法
+        static ExecutorService newFixedThreadPool(int nThreads) 创建一个可重用固定线程数的线程池
+        参数:
+            int nThreads: 创建线程池中包含的线程数量
+        返回值:
+            ExecutorService接口，返回的是ExecutorService接口的实现类对象
+
+    java.util.concurrent.ExecutorService:线程池接口
+        submit(Runnable task) 把一个Runnable任务放进去，并且执行
+        void shutdown() 关闭/销毁线程池
+
+    线程池使用步骤:
+    1. 使用newFixedThreadPool(int nThreads) 方法创建线程池
+    2. 创建一个Runnable类，重写run方法
+    3. 使用ExecutorService(线程池接口类)的方法submit(Runnable task) 传入Runnable线程任务，执行run
+    4. 使用shutdown() 销毁线程池(不建议执行)
+
+
+二.Lambda表达式
+    概述: 主要是用来省略匿名内部类的写法，强调的是结果，相当于重写接口的抽象方法
+
+    Lambda的使用前提:
+        1.使用Lambda必须具有接口，并且接口中只有一个抽象方法
+        2.使用Lambda必须具有上下文推断，就是调用的方法中，参数列表或者局部变量的类型必须是Lambda接口对应的类型才可以用。
+            备注:只有一个抽象方法的接口，称为函数式接口
+
+    标准格式:
+    1.一些参数
+    2.一个箭头
+    3.一段代码
+    格式: (参数列表)-> {重写方法的代码}
+    格式说明:
+        ():接口中抽象方法的参数列表，没有参数就空着，有参数就写出参数
+        ->:传递的意思，就是把参数传递给方法体{}
+        {}:重写几口的抽象方法的方法体
+
+    可以省略的规则:
+    1.()小括号内的参数类型可以省略
+    2.()如果小括号有且只有一个参数，则小括号可以省略
+    3.如果大括号内只有一个语句，无论是否有返回值，都可以省略return,大括号和语句分号
+

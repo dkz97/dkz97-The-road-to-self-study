@@ -1,0 +1,42 @@
+1.什么是api
+2.Scanner类:键盘的输入
+3.Random类:
+4.ArrayList类: 数组的复杂形式
+
+
+一.java,api
+    相当于java的官方文档，可以在里面查询java的所有的类的用法等
+    api相当于官网文档，字典。
+
+二.Scanner类
+    用于键盘输入的类
+    导包的位置在 java.util
+    创建对象 Scanner scr = new Scanner(System.in)    这样创建可以使键盘输入
+    scr.nextInt() 输入整数
+    scr.next()  输入字符串
+
+三.Random类
+    用于产生随机数
+    导包的位置在 java.util
+    创建对象: Random r = new Random()
+    r.nextInt(随机的数值范围)   0开始，不取最后一个，若不给值的话就随机出现Int数据类型的范围数字
+
+
+四.ArrayList类
+    ArrayList<E> list = new ArrayList<>()   <>内的E为占位符，用来填写引用数据类型的，以及ArrayList中只能存储引用数据类型
+    list.add()  往里面添加相同数据类型的元素，返回值为true/false 来看是否成功
+    list.remove(索引值)    根据索引删除对应的元素，返回值为删除的元素
+    list.get(索引值)   根据索引得到对应的元素，返回值为对应的元素
+    list.size() 获得ArrayList集合的长度
+
+    若想要放基本类型就需要用到包装类
+    基本数据类型          包装类(引用类型，包装类都位于java.lang包下)
+    byte                 Byte
+    short                Short
+    int                  Integer
+    long                 Long
+    float                Float
+    double               Double
+    char                 Character
+    boolean              Boolean
+    获取对应元素可以直接用基本数据类型就可以了，会自动拆包

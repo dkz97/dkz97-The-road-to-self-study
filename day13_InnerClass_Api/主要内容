@@ -1,0 +1,123 @@
+1.final关键字
+2.内部类
+3.Data类
+4.DateFormat类
+5.Calendar类
+6.StringBuilder类
+
+一.final关键字
+    可以用来修饰类、方法、成员变量和局部变量
+
+    1.修饰类
+    public final class 类名称 {...}
+    含义: 当final修饰类的时候，这个类无法被继承，自然而然，他的方法也不能被重写
+
+    2.修饰方法
+    修饰符 final 返回值类型 方法名称() {方法体}
+    含义：此方法不能被覆盖重写
+
+    3.修饰成员变量
+    private final 数据类型 变量名称 = xxx
+    注意:  由于成员变量具有默认值，所以需要给成员变量赋值
+           要么直接赋值,要么通过构造方法赋值
+           如果不直接赋值，必须要有一个构造方法会对final进行赋值
+
+    4.修饰局部变量
+    一旦final用来修饰局部变量，那么这个变量就不能再进行改变
+    但是需要注意的是，对于引用类型来说，不能改变的是地址值。
+
+
+
+二.内部类
+    概念: 一个内里面包含另一个类，或者一个类方法里面包含一个类，成员内部类和局部内部类
+
+1.成员内部类
+    修饰符 class 外部类名称{
+        修饰符 class 内部类名称{
+            // ...
+        }
+        //...
+    }
+    内部类可以随便用外面类的东西，但是外面类的不能随便用内部类的
+
+    成员内部类的使用:
+    1.间接方式: 可以通过外部类的方法创建内部类的对象使用内部类，相当于间接的使用了内部类的方法
+    2.直接方式: 公式，创建内部类对象
+        【外部类名称.内部类名称 对象名 = new 外部类名称().new 内部类名称】
+
+    注意:
+    1.如果在内部类方法中出现了变量的重名。
+        局部变量直接使用
+        内部类成员变量: this.变量名称
+        外部类成员变量: 外部类名称.this.变量名称
+
+
+2.局部内部类的定义
+    修饰符 class 外部类名称 {
+        修饰符 返回值名称 外部类方法名称(参数列表) {
+            class 局部内部类名称{
+                //...
+            }
+        }
+    }
+    注意:
+    1.调用直接在外面创建对象就行
+    2.局部内部类如果要使用所在方法的局部变量的时候，变量需要是final的时候才可以使用
+
+    权限修饰符:
+    public > protected > (default) > private
+    1.外部类: public / (default)
+    2.成员内部类: 都可以
+    3.局部内部类: 什么都不写
+
+
+3.匿名内部类
+    使用场景:如果接口的实现类(或者是父类的子类)只需要使用唯一的一次，这种情况就可以省略创建一个实现类或者子类，直接使用匿名内部类
+
+    匿名内部类的格式:
+    接口名称 对象名 = new 接口名称() {
+        //覆盖重写
+    };
+
+    注意:
+    1.匿名内部类只能创建的是一个对象，当只使用唯一一次的时候才使用匿名内部类
+    2.匿名内部类和匿名对象不一样，一个是省略类名称，一个是省略对象名称
+
+    类也可以作为成员变量和参数列表，
+
+
+三.Date类
+    java.util包
+    空构造方法:
+    Data date = new Date() 空参数构造方法会返回当前系统的日期和时间
+    毫秒值构造方法:
+    Data date = new Date(long date)   传入毫秒值，然后转换为Data日期。
+    常用类方法:
+    date.getTime()  返回一个long类型的毫秒值
+四.DateFormat类
+    DateFormat是一个抽象类，无法直接创建对象，需要创建他的子类
+    构造方法 simpleDateFormat(String pottern)
+    成员方法 String format(Date date)  按照指定的格式把Date日期格式化为字符串
+            Date parse(String source)   把符合模式的字符解析为Date日期
+    y 年 M 月 d 日  H 时 m 分 s 秒
+五.Calendar类
+    Calendar是一个抽象类，使用getInstance()可以返回一个子类对象
+    成员方法
+        public int get(int field) 返回给定日历字段的值
+        public void set(int field, int value) 将给定的日历字段设置为给定值
+        public abstract void add(int field, int amount) 根据日历的规则的时间量
+        public Date gettime()
+        field 日历字段
+六.System类
+    public static long currentTimeMillis() ： 返回当前的毫秒值时间
+    public static void arraycopy()  把原数组复制到后面数组中
+七.StringBuilder
+    字符串缓冲区，提高字符串操作效率
+    相当于一个可以更改长度的字符串类型，节省内存
+    构造方法:
+    StringBuilder 对象名称 = new StringBuilder()
+    如果不给定参数的化就默认是空的，给定参数的话就给进去
+
+    成员方法:
+    public StringBuilder append() 相当于字符串的增加， 并且在同一个地址值上，无需接受返回值，会在原地址上添加
+    public String toString()    把StringBuilder转换成字符串
