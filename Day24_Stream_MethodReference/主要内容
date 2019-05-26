@@ -1,0 +1,65 @@
+1.Stream流
+2.方法引用
+
+
+一.Stream流
+    主要是用于集合的流，方便集合的各种使用。
+    Stream是一个流模型，是集合元素的函数模型，不是集合，也不是数据结构，本身不存储任何数据。
+    流对象只能使用一次，一次过后就不能再使用
+
+    获取Stream流的方法
+    Collection的集合可以用方法 stream()获取流，对于Map集合来说，可以先获取key或者values或者key,value的方法来变成Collection的集合
+    static <T> Stream<T> of (T..Values) 可以直接用静态方法of(填入数据) 来获取流对象
+
+
+    流对象的方法:
+    终结流对象不返回流对象:
+    void forEach(Consumer<? super T> action) forEach会对流对象进行遍历，由于传入的参数是Consumer接口，可以重写方法来对遍历的元素进行操作
+
+    long count() 会返回流对象的长度
+
+    返回流对象的:
+    Stream<T> filter(Predicate<? super T> predicate)  也会对流对象进行遍历，传入的参数是Predicate接口，可以对流进行判断，然后true的元素返回新的流中
+
+    Stream<T> map(Function<? super T, ? extends R> mapper) 可以把当前的流转换成另外一种类型的流，在传输重写方法中来进行转换操作
+
+    Stream<T> limit(long maxSize)  比如输入n，那就会从0开始返回n个的数据到新的流中
+
+    Stream<T> skip(long n)  输入n，那就会从n开始，返回后面的数据到新的流中
+
+    Stream<T> concat(流1，流2) 合并两个流返回新的流
+
+
+二.方法引用
+    基本概念: 主要是简写lambda表达式，可以用来作为Lambda表达式的替代者。
+    引用方法符号:  :: 双冒号
+    会自动把参数传递到方法中
+
+
+    语义分析:
+    Lambda表达式 : s -> System.out.println(s);
+    方法引用写法: System.out::println (对象名引用方法)
+
+
+    对象名称引用类方法: 对象名称::类方法
+    类名称引用类方法: 类名称::静态方法
+    super可以引用父类的方法: super::方法
+    this可以引用本类的方法: this::方法
+
+    构造器方法
+    s -> return Person(s)
+    Person::new
+
+    数组
+    s -> return int[s]
+    int[]::new
+
+    基本来说就是，简化lambda，参数会自动传进去，不管是对象，类，super,this的调用都可以，基本都是对象::方法，这样来用，方法的话会自动传递参数
+
+    相对于构造器和方法的话，就是把 类::new 这样的话相当于 new.类(参数)
+
+
+
+
+
+

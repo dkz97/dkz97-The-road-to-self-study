@@ -1,0 +1,174 @@
+1.Junit
+2.反射
+3.注解
+
+
+
+
+
+一.junit
+
+    用于测试的，可以就设定一个方法，然后Java只会执行这个方法。
+
+    测试:
+    黑盒测试: 不用写代码，就输入数据，看程序能否输出期望的值
+    白盒测试: 需要写代码，关注程序的具体执行流程
+
+    junit:白盒测试
+    步骤:
+        1.定义一个测试类(测试用例)
+            测试类命名:被测试的类名字+Test
+            包名:xxx.xxx.xx.test
+
+        2.定义测试方法:可以独立运行
+            建议:
+            方法名命名: test+测试方法名
+            返回值: void
+            参数列表:空参
+
+        3.给方法加@Test注解
+
+        4.导入junit依赖环境
+
+    结果:
+        1.输出为绿色的就是成功
+        2.红色就是为失败
+        3.基本的话会使用断言来操作
+            使用静态方法来测试最终结果
+            把运算的结果和期望的结果来对比，如果相同的话就就成功
+            Assert.assertEqual(期望的结果， 运算的结果);
+    补充:
+        在方法上面写这两个注解的话可以有特定的作用
+        @Before
+            注解下的方法在测试方法之前总会自动执行
+        @After
+            注解系的方法在测试方法之后总会自动执行
+
+
+二.反射
+    1. 基本概念: 使用Class类，字节码文件来玩，可以用于框架。操作方便，框架设计的灵魂
+        框架: 半成品的软件，可以在框架的基础上进行开发，省时省力
+        反射: 将类的各个组成部分封装成其他对象，这就是反射
+            好比如，把成员变量封装成Filed，把方法封装成Method,把构造方法封装成Constructor，等等
+            在使用的时候可以用这三个对象来拿取各自的东西然后调用
+            好处:
+                1. 可以在程序运行的过程中操作这些对象,就是把硬盘对象放在内存中
+                2. 可以解藕，提高程序的可扩展性
+
+    2. 获取Class对象的方法
+        1. Class.forName("全类名称") 要把包名称加上类名称传递进去
+            多用于配置文件，可以读取配置文件
+        2. 类名.class: 通过类名称的属性class获取
+            多用于参数的传递
+        3. 对象.getClass()
+            多用于获取字节码的方式
+
+        同一个字节码文件在一次程序的运行过程中只会创建一次，所以就算三种方法分开创建，但是如果是同一次运行的，那都是只有一个Class对象
+
+    3.* Class对象功能：(有Declared的就会获取全部，没有的话只会获取public的)
+      		* 获取功能：
+      			1. 获取成员变量们
+      				* Field[] getFields() ：获取所有public修饰的成员变量
+      				* Field getField(String name)   获取指定名称的 public修饰的成员变量
+
+      				* Field[] getDeclaredFields()  获取所有的成员变量，不考虑修饰符
+      				* Field getDeclaredField(String name)
+      			2. 获取构造方法们
+      				* Constructor<?>[] getConstructors()
+      				* Constructor<T> getConstructor(类<?>... parameterTypes)
+
+      				* Constructor<T> getDeclaredConstructor(类<?>... parameterTypes)
+      				* Constructor<?>[] getDeclaredConstructors()
+      			3. 获取成员方法们：
+      				* Method[] getMethods()
+      				* Method getMethod(String name, 类<?>... parameterTypes)
+
+      				* Method[] getDeclaredMethods()
+      				* Method getDeclaredMethod(String name, 类<?>... parameterTypes)
+
+      			4. 获取全类名
+      				* String getName()
+
+            获取到各个对象之后自身的方法:
+                1.成员变量对象的方法:
+                    1.获取和设置值
+                        void get("类对象")  使用获取到的变量对象来调用这个方法，传入的是变量所在类的对象
+                        void set("类对象", 新的值)
+                    2.忽略访问权限修饰符的安全检查
+                      	setAccessible(true):暴力反射
+
+                2.构造方法对象的方法
+                    1.创建对象：
+                      	T newInstance(Object... initargs)  使用获得的构造器对象来调用，传入的是构造方法的参数
+
+                      	如果使用空参数构造方法创建对象，操作可以简化：Class对象的newInstance方法
+
+                3.成员方法对象的方法
+                    1.执行方法：
+                    	Object invoke(Object obj, Object... args) , 用获取到的方法对象来调用，传入的是方法所在类的对象和方法的参数
+
+                    2.获取方法名称：
+                    	String getName:获取方法名
+
+
+三.注解
+    1. 概念: 写上去给程序看的
+
+    2. 注解的定义: Annotation, 也叫元数据，是一个在代码层面级别的说明。与类、接口、枚举是在同一个层次。
+        它可以声明在包、类、字段、方法、局部变量、方法参数等的前面，用来对这些元素进行说明、注释。
+
+    3. 注解的使用: @ + 注解名称
+
+    4. 注解作用的分类:
+        1. 编写文档: 通过代码里面的表示注册生成doc文档
+        2. 代码分析: 可以通过注解的设置来进行分析代码[使用反射]
+        3. 编译检查: 能让编译器对编译的代码进行检查，例如[Override]
+
+    5. JDK中已经有的注解:
+        * @Override	：检测被该注解标注的方法是否是继承自父类(接口)的
+        * @Deprecated：该注解标注的内容，表示已过时
+   		* @SuppressWarnings：压制警告
+       	        一般传递参数all  @SuppressWarnings("all")
+
+    6. 自定义注解
+    		格式：
+    			元注解
+    			public @interface 注解名称{
+    			    //属性列表都是抽象方法
+    				属性列表;
+    			}
+
+    		本质：注解本质上就是一个接口，该接口默认继承Annotation接口
+
+    		属性：接口中的抽象方法
+    			要求：
+    				1. 属性的返回值类型有下列取值
+    					* 基本数据类型
+    					* String
+    					* 枚举
+    					* 注解
+    					* 以上类型的数组
+
+    		在注解的使用需要给属性赋值:  @注解名称(属性名称 = 对应的值)
+    			1. 如果定义属性时，使用default关键字给属性默认初始化值，则使用注解时，可以不进行属性的赋值。
+    			2. 如果只有一个属性需要赋值，并且属性的名称是value，则value可以省略，直接定义值即可。
+   				3. 数组赋值时，值使用{}包裹。如果数组中只有一个值，则{}可以省略
+
+    7.元注解：用于描述注解的注解
+      	1. @Target：描述注解能够作用的位置
+      				* ElementType取值：
+      					* TYPE：可以作用于类上
+      					* METHOD：可以作用于方法上
+      					* FIELD：可以作用于成员变量上
+
+        2. @Retention：描述注解被保留的阶段
+      				* @Retention(RetentionPolicy.RUNTIME)：当前被描述的注解，会保留到class字节码文件中，并被JVM读取到
+
+      	3. @Documented：描述注解是否被抽取到api文档中
+
+        4. @Inherited：描述注解是否被子类继承
+
+    8.注解的使用
+        1. 获取加了注解位置的对象
+        2. 用对象使用方法 getAnnotation("注解名称".class) 可以获取注解的对象
+        3. 使用注解对象调用注解的属性

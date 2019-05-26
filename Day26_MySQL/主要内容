@@ -1,0 +1,249 @@
+1.数据库的基本概念
+2.SQL,DDL DML,DQL等操作
+
+
+
+一.数据库的基本概念
+    基本概念: 就是存储数据的库，可以用自己的电脑，或者专门存储数据库的硬件来存储和管理。
+        数据库: DataBase 简称: DB
+
+    数据库特点:
+        持久化的存储数据,数据库就是一个文件系统
+        方便存储和管理数据
+        SQL就是一个标准语法，用这个标准语法来操作数据库和数据库的数据
+
+    MySQL
+        启动关闭:
+        1.对于mac来说，在偏好设置
+        2.windows 来说 启动在打开服务的窗口
+            cmd命令： net start mysql;
+                     net stop mysql;
+
+
+        登陆和退出
+            1.登陆本地的mysql，先把cmd进入到mysql的bin文件夹中
+            2. 登陆命令:
+                登陆本地服务器: mysql -u 账号名称 -p 密码
+                登陆别人的服务器: mysql -h ip地址 -u 账号名称 -p 密码
+            3. 退出命令
+                quit;
+                exit;
+
+        目录结构:
+            数据库: 相当于文件夹
+            数据表: 相当于文件
+            数据: 文件内的内容
+
+
+二.SQL
+    1.什么是SQL:
+        SQL(Structured Query Language) : 结构化查询语言
+        基本上所有关系型数据库都是用SQL来操作，不同公司或者不同的数据库SQL有小小不一样，不一样的地方被称为"方言".
+
+    2.SQL通用语法:
+        1.可以单行或者多行书写，以 ";" 分号为结尾
+        2.可以使用空格和缩进来增强可读性
+        3.语句不区分大小写，但是关键字建议用大写
+        4.注释方法
+            单行注释: -- (空格) 注释内容，或者  #注释内容
+            多行注释: /* 注释内容 */
+
+    3.SQL的操作分类(大分类)
+        操作数据库和数据表，列等:
+            DDL(Data Definition Language) 数据定义语言:
+                用来定义数据库对象，表，列等。
+                关键字: create(创建), alter(修改),drop(删除) 等
+
+        操作数据:
+            DML(Data Manipulation Language) 数据操作语言:
+                用来对数据库中的表数据进行增删改操作。
+                关键字: insert(增) delete(删) update(改)等
+        查询数据:
+            DQL(Data Query Language) 数据查询语言:
+                用来查询数据库中的表数据
+                关键字: select(挑选), where(条件语句)等
+
+        定义访问权限和安全级别:
+            DCL(Data Control Language) 数据控制语言:
+                用来定义数据库的访问权限和安全级别，关键字 grant(承认) revoke(撤回) 等
+
+
+    DDL(Data Definition Language): 数据库，表，列表的定义:
+    一.操作数据库
+        1.C(Create):创建
+            create database 数据库名称;
+            create database if not exists 数据名称; (判断不存在才创建)
+            create database 数据库名称 character set 字符集; (创建数据库设置特定的字符集)
+            create database if not exists 数据库名称 character set utf8; (当数据库不存在，创建数据库，并且设置为utf-8字符集)
+
+        2.R(Retrieve):查询
+            show databases;
+                (查询所有数据库)
+            show create database 数据库名称;
+                (查询数据库的编码集，也可以查询他的创建语句)
+
+        3.U(Update): 修改
+            修改数据库的字符集:
+                alter database 数据库名称 character set 字符集;
+
+        4.D(Delete):删除
+            删除数据库:
+                drop database 数据库名称;
+            查询存在后再删除
+                drop database if exists 数据库名称;
+
+        5.使用数据库:
+            select database();  查询当前使用的数据库
+            use 数据库名称; 使用数据库
+
+
+    二.操作表和列
+        1.C(Create):创建
+            create table 表名称(列1 列1的值类型, 列2，列2的值类型.....)
+            常用数据类型:
+                    1.int
+                    2.double(允许多少个小数, 能取多少值)
+                    3.date 日期 yyyy-MM-dd
+                    4.datetime 日期和事件 yyyy-MM-dd HH:mm:ss
+                    5.timestamp 时间戳，默认会填入机器的时间
+                    6.varchar(字符数)
+
+            复制表:
+                create table 新的表名 like 被复制的表ing
+
+        2.R(Retrieve):查询
+            show tables; 查询当前有多少个表
+            show create table 表名称:  查询表的创建语句
+            desc 表名称;  显示当前的表属性
+
+        3.D(Delete):删除
+            drop table 表名称;
+            drop table if exists 表名称; 判断存在再删除
+
+        4.U(Update):修改
+            1.修改表名称
+                alter table 表名称 rename to 新的表名称;
+            2.修改表字符集
+                alter table 表名称 character set 字符集;
+            3.在表中添加一列
+                alter table 表名称 add 列名 数据类型;
+            4.修改列名称和类型
+                alter table 表名称 change 列名 新列名 新数据类型;
+                alter table 表名称 modify 列名 新数据类型; (不修改名称，修改类型)
+            5.删除列
+                alter table 表名称 drop 列名
+
+
+
+    2.DML(Date Manipulation Language) 数据操作语言:
+        1.添加数据
+            insert into 表名称(列1,列2) values (值1, 值2)
+            注意:
+                1. 列名和值要一一对应
+                2. 如果表名称后不写列名，那就在values后面填入所有列表的值
+                3. 出了数字类型，其他类型需要引号引起来
+
+        2.删除数据
+            delete form 表名称 [where 条件]
+            注意:
+                1.如果不添加条件，默认删除所有数据
+                2.建议使用 TRUNCATE TABLE 表名称删除所有数据，这样会删除表的数据后再创建一个新表
+
+        3.修改数据
+            update 表名称 set 列1 = 值1, 列2 = 值2,....[where 条件]
+            注意:
+                1.如果不加条件默认将表中的记录都修改
+
+
+    3.DQL (Date Query Language) 数据查询语言
+        1.语法
+            select
+                字段列表
+            from
+                表名列表
+            where
+                条件列表
+            group by
+                分组字段
+            having
+                分组之后的条件
+            order by
+                排序
+            limit
+                分页限定
+
+        2.基础查询
+            1.多个字段查询
+                select 字段1, 字段2, 字段3.... form 表名;
+                注意:
+                    如果查询所有字段，可以用 * 来代替，但是不建议 (字段就是列名)
+
+            2.去除重复查询
+                select distinct 字段1, 字段2 ... form 表名称;
+                    只有在查询的字段完全相同的时候才会去除重复
+
+            3.计算列
+                一般使用四则运算计算一些列的值
+                select 字段1,字段2, (字段1+字段2) from 表名称
+                当null参与运算的时候，计算结果都是null
+                    解决办法
+                    ifnull(表达式1,表达式2) 判断表达式1是否为null，如果是null，则给表达式2的值
+
+            4.起别名
+                在字段后面加一个AS 然后起其他名字
+
+        3.条件查询
+            1.where字句后面跟条件
+            2. 运算符
+                >  <  >=  <=  =  <>
+                between..and
+                IN(集合) 在集合中的
+                LIKE
+                    模糊查询:
+                        _: 一个占位符
+                        &: 多个任意字符
+                IS NULL
+                AND 或者 &&
+                or 或者 ||
+                not 或者 ！
+
+        4.排序查询
+            语法 order by 子句
+                order by 排序字段1 排序方式1, 排序字段2 排序方式2...
+
+            排序方式 :
+                ASC: 默认升序
+                DESC: 降序
+
+            注意: 多个排序字段的时候，只有前面的条件值一样，才会执行第二个排序条件
+
+        5.聚合函数: 将一列数据作为一个整体，进行纵向的计算
+            1. count 计算个数
+                一般选择非空的列:主键
+                2.count(*)  列
+            2. max:最大值
+            3. min:最小值
+            4. sum：总和
+            5. avg: 平均值
+
+                select 聚合函数1(列名), 函数2(列名) from 表名；
+
+                在聚合函数中,null的值都是排除的
+                    1.可以选择没有null的列进行计算
+                    2.IFNULL函数
+
+        6.分组查询:
+            1.语法: group by 分组字段;
+            2.注意:
+                1.分组之后查询的字段为: 分组的字段和 聚合函数
+                2.where和having的区别
+                    where是在分组之前进行条件判断,having是分组之后进行限定的，不满足话就不会被查询
+                        from 字段 后面加where
+                    having可以加聚合函数,where后面不能加聚合函数
+                        group by 后面加having
+
+        7.分页查询
+            1.语法 limit 开始的索引,每页查询的页数
+
+            2.有一个公式: 开始的索引 = (当前的页码 - 1) * 每页显示的条数
+

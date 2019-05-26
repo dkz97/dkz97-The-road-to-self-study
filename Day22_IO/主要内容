@@ -1,0 +1,88 @@
+1.缓冲流
+2.转换流
+3.序列化流
+4.打印流
+
+
+
+
+一.缓冲流
+    缓冲流的原理: 先把读取的字节/字符或者写入的字节/字符先存储到一个缓冲区中，然后按照特定的数量再从缓冲区中带到硬盘或内存中
+
+
+    1.字节缓冲的输出流
+    BufferedOutputStream(OutputStream, int size)    创建缓冲输出流，把指定的字节输出流放进去，字符输出流也是一样
+     使用步骤:
+      1. 创建一个字节/字符输出流，并且指定输出流对象
+      2. 创建Buffered缓冲流对象，然后把指定的输出流对象放在构造方法
+      3. 使用write写入内部缓冲区
+      4. 使用flush，把缓冲区的东西写在硬盘当中
+      5. close释放资源
+
+
+    2.字节缓冲的输入流
+    BufferedInputStream(InputStream, int size) 创建缓冲输入流
+      使用步骤:
+        1. 创建一个字节/字符输入流，并且指定输入流对象
+        2. 创建Buffered缓冲流对象，然后把指定的输入流对象放在构造方法
+        3. 使用read读取数据在内部缓冲区
+        4. close释放资源
+
+    3.字符缓冲输出流和字符缓冲输入流
+        基本概念差不多
+        两个特殊方法
+        输出流的: newLine() 根据当前系统写入一个换行符
+        输入流的: String readLine() 一行一行的读取，并且返回的是字符串
+
+
+二.转换流
+    基本概念: 转换流就是字节和字符的各种转换，并且根据编码表对字符进行GBK和UTF-8的转换
+
+    1.转换输入流
+        InputStreamReader(InputStream in,String charsetName)后面的参数是设定编码类型，默认为UTF-8
+
+        基本方法和其他差不多，都是进行创建然后读取然后关闭释放资源
+        需要注意的是，读取的时候需要和文档的编码是一致，不然会乱码
+
+    2.转换输出流
+        OutputStreamWriter(OutputStream out,String charsetName)
+        可以根据指定的编码进行文件的写入
+
+三.序列化流
+    基本概念: 可以把自定义类(需要实现接口Serializable)和其他类进行序列化存储到硬盘或者在硬盘中读取
+        每次序列化的时候，相对应的文件都会有一个序列号，当原本的类修改了之后序列号也会改变，要注意这点，或者可以设定序列号不变
+
+
+    构造方法:
+    字节序列化输出流:
+        ObjectOutputStream(OutputStream out)
+    特有方法:
+        writeObject(Object obj) 把指定对象写入
+
+    字节序列化输入流
+        ObjectInputStream(InputStream in)
+    特有方法:
+        Object readObject() 从输入流中读取对象
+        注意读取的对象是Object可以进行强转换
+
+    关键字:
+        static  静态关键字
+        transient 瞬态关键字
+        有这两个关键字的变量都不会被序列化
+
+    private static final long serialVersionUID 可以对固定序列号
+
+四.打印流
+    就是println
+    只负责数据的输出，不会读取
+    就是可以内存的东西写入到硬盘中，平时使用的println都是写入在控制台中，也可以写入其他文件
+
+    构造方法
+    printStream(File file)
+    printStream(OutputStream out)
+    printStream(String fileName)
+
+    特有方法
+    print()
+    println()
+    可以利用这两个方法把任何东西放入相对应的地方中
