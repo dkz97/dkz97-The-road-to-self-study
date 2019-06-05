@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>表单标签</title>
+    <link rel="stylesheet" href="a.css">
+</head>
+<body>
+<!--定义表单-->
+<form action="#" method="get">
+    <table  border="1">
+        <!--第一行-->
+        <tr>
+            <td>
+                <label for="username">用户名</label>
+            </td>
+            <td>
+                <input type="text" name="username" id="username" placeholder="请输入用户名">
+            </td>
+        </tr>
+
+        <!--第二行-->
+        <tr>
+            <td>
+                <label for="password">密码</label>
+            </td>
+            <td>
+                <input type="password" name="password" id="password" placeholder="请输入密码">
+            </td>
+        </tr>
+
+        <!--第三行-->
+        <tr>
+            <td>
+                Email
+            </td>
+            <td>
+                <input type="email" name="email" placeholder="请输入邮箱">
+            </td>
+        </tr>
+
+        <!--第四行-->
+        <tr>
+            <td>
+                姓名
+            </td>
+            <td>
+                <input type="text" name="name" placeholder="请输入真实姓名">
+            </td>
+        </tr>
+
+        <!--第五行-->
+        <tr>
+            <td>
+                手机号
+            </td>
+            <td>
+                <input type="text" name="phone" placeholder="请输入您的手机号">
+            </td>
+        </tr>
+
+        <!--第六行-->
+        <tr>
+            <td>
+                性别
+            </td>
+            <td>
+                <input type="radio" name="gender" value="male">男
+                <input type="radio" name="gender" value="female">女
+            </td>
+        </tr>
+
+        <!--第七行-->
+        <tr>
+            <td>
+                出生日期
+            </td>
+            <td>
+                <input type="date" name="birthday">
+            </td>
+        </tr>
+
+        <!--第八行-->
+        <tr>
+            <td>
+                验证码
+            </td>
+            <td>
+                <input type="text" name="auth_code">
+                <img src="./img/verify_code.jpg">
+            </td>
+        </tr>
+
+        <!--最后一行-->
+        <tr>
+            <td align="center" colspan="2">
+                <input type="submit" value="注册" >
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

@@ -1,0 +1,177 @@
+1.jdbc
+2.数据库连接池
+3.spring jdbc
+
+
+
+
+
+一.jdbc
+    概念: Java Database Connectivity Java 数据库连接, 说白了就是Java语言操作数据库
+    JDBC本质: 官方(sun公司)定义的一套操作所有关系数据库的规则，就是接口，由各个数据库的厂商去实现这套接口，厂商提供数据库驱动jar包
+              java主要使用这套接口编程，真正实现并且执行的代码的是驱动jar包中的实现类.
+
+    快速入门:
+        步骤:
+        1.导入驱动jar包
+        2. 注册驱动
+        3. 获取数据库连接对象 Connection
+        4. 定义sql语句
+        5. 使用数据库连接对象获取执行sql语句的对象 Statement
+        6. 执行sql,接收返回结果
+        7. 处理结果
+        8. 释放资源
+
+    详细解释:
+         1.导入驱动jar包 mysql-connector-java-版本-bin.jar
+                1.复制jar包到项目的libs目录下
+                2.然后对libs进行右键 --> add as library
+
+         2.注册驱动: 告诉程序应该用哪一个数据库驱动jar
+            驱动管理的对象 DriverManger
+            方法: static void registerDriver(Driver driver): 注册与给定的驱动程序
+            平时注册驱动的话只要Class.forName("com.mysql.jdbc.Driver")就可以了。com那个的源码存在静态代码块，会默认执行上面那个方法
+
+         3. 获取数据库连接
+            也是用对象 DriverManger
+            方法: static Connection getConnection(url,user,password)
+            url:  指定的连接路径
+                语法: jdbc:mysql:// ip地址:端口号/数据库名称
+
+         4.Connection对象
+            1.获取执行sql语句的对象 Statement
+                Statement createStatement()
+                PreparedStatement prepareStatement(String sql)
+            2.管理事务
+                开启事务:setAutoCommit(boolean autoCommit): 开启事务就传入false就好了
+                回滚事务:rollback()
+                提交事务:commit()
+
+         5.statement对象:执行sql语句
+            1.执行sql
+                1.boolean execute(String sql): 可以执行任意sql
+                2.int executeUpdate(String sql): 主要执行DML语句和DDL语句，返回的是影响的行数
+                3.ResultSet executeQuery(sql): 主要执行DQL语句
+
+         6.ResultSet: 结果集对象，主要是用于查询返回的结果
+            方法:
+                next():游标向下移动，如果没有数据就返回false
+                getXXX(参数): 获取数据
+                    xxx代表数据类型,是什么数据类型就获取什么数据类型的数据
+                    参数: 有两个不同的参数传入方法
+                        1.int : 传入列的编号，从1开始
+                        2.String : 传入列的名称
+
+         7.PreparedStatement: 执行sql对象
+            1.SQL注入问题:在传入数据，拼接sql的时候，如果传入了的数据拼接后，与特殊的sql关键字进行冲突，然后拼接后会造成安全性问题
+
+            2.解决这个问题的话就用PreparedStatement对象来解决，这个是sql语句的预编写
+
+            3.预编译的sql，使用 ? 问号来作为占位符
+
+            4.步骤:
+                1. 导入驱动的jar包
+                2. 注册驱动
+                3. 获取连接对象 Connection
+                4. 定义sql语句，传入数据的地方 使用 ? 进行占位
+                5. 获取执行sql的语句 PreparedStatement(String sql)
+                6. 给 ? 进行赋值
+                    使用方法 SetXXX(参数1, 参数2)
+                        参数1: ? 的位置编号
+                        参数2: ？ 的值
+                7. 执行sql语句，接受返回结果。不需要传递sql
+                8. 处理结果
+                9. 释放资源
+
+            5.注意
+                后期基本都会使用PreparedStatement语句来进行增删改查
+                效率高并且防止sql注入
+
+
+    jdbc管理事务
+        操作:
+            1.开启事务
+            2.回滚事务
+            3.提交事务
+
+        使用Connection对象来操作事务
+           开启事务:setAutoCommit(boolean autoCommit): 开启事务就传入false就好了
+                在执行sql之前开启事务
+           回滚事务:rollback()
+                在catch中有错误的时候回滚事务
+           提交事务:commit()
+                所有sql都准确无误就提交事务
+
+
+
+二.数据库连接池
+    1.概念:
+        就是一个容器，里面用来存放数据库连接对象的容器
+            系统初始化好后，创建容器，然后在容器中有一些连接对象，然后需要访问数据库的时候就从容器中获取对象，用户访问完后就归还给容器
+        特点:节约资源，用户访问高效
+
+    2.实现:
+        标准的接口:DataSource     javax.sql包下面的
+            方法
+                获取连接: getConnection()
+                归还连接: Connection.close() 如果对象是从连接池中获取的，那么close不会关闭对象，而是把对象返回到连接池中
+
+            一般不会直接使用这个，而是使用数据库厂商来实现
+            1.C3P0: 数据库连接池技术
+            2.Druid: 数据库连接池技术，是阿里巴巴提供的
+
+
+    3.C3P0：数据库连接池技术
+        * 步骤：
+    		1. 导入jar包 (两个) c3p0-0.9.5.2.jar mchange-commons-java-0.2.12.jar ，
+      			* 不要忘记导入数据库驱动jar包
+      		2. 定义配置文件：
+      			* 名称： c3p0.properties 或者 c3p0-config.xml
+      			* 路径：直接将文件放在src目录下即可。
+      		3. 创建数据库连接池对象 new ComboPooledDataSource
+      		4. 使用数据库连接池对象获取连接： getConnection
+      		* 代码：
+      		    1.创建数据库连接池对象
+      	        DataSource ds  = new ComboPooledDataSource();
+      	        2. 获取连接对象
+      	        Connection conn = ds.getConnection();
+
+
+    4.Druid:
+        步骤:
+
+            1. 导入jar包 druid-1.0.9.jar
+            2. 自定义配置文件：
+            	* 是properties形式的
+            	* 可以叫任意名称，可以放在任意目录下
+            3. 使用类加载器，然后再查找类加载器的文件，然后传入配置文件到Properties对象中
+            4. 获取数据库连接池对象：通过工厂来来获取  DruidDataSourceFactory.createDataSource(Properties ps)
+            5. 获取连接：getConnection(sql)
+
+
+三.Spring JDBC
+    概念:
+        是Spring框架对JDBC的简单封装，提供一个JDBCTemplate对象来简化开发，相当于JDBC的工具类
+
+    步骤:
+        1.导入jar包
+        2.创建JdbcTemplate对象，需要传递数据库连接池对象
+            JdbcTemplate template = new JdbcTemplate(DataSource ds)
+        3.定义sql语句
+        4.调用Template的方法来执行sql语句
+            1.int Update(sql) 用来执行DML的语句的
+
+            2.Map<String, Object> queryForMap(sql)
+                执行查询语句，将查询的结果存储在Map集合中，但是只能查询一行，由列名为key，值为value
+
+            3.List(Map<String, Object>) queryForList(sql)
+                执行查询语句，一行的结果存储在Map集合中，多行的话就是一行一行存储在List集合中
+
+            4.List<T> query(sql,RowMapper)
+                这个可以将查询的结果存储为javaBean对象，就是定义一个和表一样的java类，然后可以以行为单位作为数据来创建java类的对象
+                第一个参数为sql
+                第二个参数是RowMapper，可以自己重构方法，也可以使用构造方法: new BeanPropertyRowMapper<T> (class对象)
+                把要创建的类写到泛型中，然后在小括号那里传入要创建类的class字节码
+
+            5.T queryForObject(sql, T.class)
+                主要是用于查询聚合函数，然后聚合函数返回什么类型的，泛型就填入什么类型的就行
