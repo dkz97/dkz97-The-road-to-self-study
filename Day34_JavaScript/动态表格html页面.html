@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>动态表格</title>
+
+    <style>
+        table{
+            border: 1px solid;
+            margin: auto;
+            width: 500px;
+        }
+
+        td,th{
+            text-align: center;
+            border: 1px solid;
+        }
+        div{
+            text-align: center;
+            margin: 50px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div>
+    <input type="text" id="id" placeholder="请输入编号">
+    <input type="text" id="name"  placeholder="请输入姓名">
+    <input type="text" id="gender"  placeholder="请输入性别">
+    <input type="button" value="添加" id="btn_add">
+
+</div>
+
+
+    <table>
+        <caption>学生信息表</caption>
+        <tr>
+            <th>编号</th>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>操作</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>令狐冲</td>
+            <td>男</td>
+            <td><a href="javascript:void(0);" onclick="remove_tr(this)">删除</a></td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td>任我行</td>
+            <td>男</td>
+            <td><a href="javascript:void(0);" onclick="remove_tr(this)">删除</a></td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td>岳不群</td>
+            <td>?</td>
+            <td><a href="javascript:void(0);" onclick="remove_tr(this)">删除</a></td>
+        </tr>
+
+
+    </table>
+
+<script>
+    /*
+    // 获取按钮对象，添加单击事件
+    var btn = document.getElementById("btn_add");
+    btn.onclick = addElement;
+    // 写一个函数，能对增加按钮进行操作的
+    function addElement() {
+        // 对表格进行添加的操作，需要知道填入的是什么，然后再添加到列表中
+        // 获取编号 姓名 性别对象
+        var id = document.getElementById("id");
+        var name = document.getElementById("name");
+        var gender = document.getElementById("gender");
+
+        // 获取编号。姓名，性别的返回值
+        var id_value = id.value;
+        var name_value = name.value;
+        var gender_value = gender.value;
+
+        // 把返回值设置成文本节点
+        var id_text = document.createTextNode(id_value);
+        var name_text = document.createTextNode(name_value);
+        var gender_text = document.createTextNode(gender_value);
+
+        // 创建新的td，然后把值加到td上
+        var id_td = document.createElement("td");
+        var name_td = document.createElement("td");
+        var gender_td = document.createElement("td");
+        var delete_td = document.createElement("td");
+
+        // 给td增加文本节点
+        id_td.appendChild(id_text);
+        name_td.appendChild(name_text);
+        gender_td.appendChild(gender_text);
+        // 对删除按钮进行操作，在td对象中添加a标签，对a标签增加属性
+        var delete_a = document.createElement("a");
+        delete_a.setAttribute("href","javascript:void(0);");
+        delete_a.setAttribute("onclick","remove_tr(this)");
+        delete_a.innerHTML = "删除";
+
+        delete_td.appendChild(delete_a);
+
+        // 创建tr，并且增加td
+        var tr = document.createElement("tr");
+        tr.appendChild(id_td);
+        tr.appendChild(name_td);
+        tr.appendChild(gender_td);
+        tr.appendChild(delete_td);
+
+        // 获取table对象，添加tr
+        var table = document.getElementsByTagName("table")[0];
+        table.appendChild(tr);
+    }
+    */
+    // 用innerHTML类型来写
+    var btn = document.getElementById("btn_add");
+    btn.onclick = add_Element;
+    function add_Element() {
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var gender = document.getElementById("gender").value;
+
+        var table = document.getElementsByTagName("table")[0];
+        table.innerHTML += "<tr>\n" +
+            "            <td>"+id+"</td>\n" +
+            "            <td>"+name+"</td>\n" +
+            "            <td>"+gender+"</td>\n" +
+            "            <td><a href=\"javascript:void(0);\" onclick=\"remove_tr(this)\">删除</a></td>\n" +
+            "        </tr>"
+    }
+    // 添加删除的函数，对删除进行操作 removeChild() 可以删除指定的子属性，传入的obj是a标签中的对象，使用parentNode来获取父对象
+    function remove_tr(obj) {
+        var table = obj.parentNode.parentNode.parentNode;
+        var tr = obj.parentNode.parentNode;
+        table.removeChild(tr);
+    }
+
+</script>
+
+</body>
+</html>

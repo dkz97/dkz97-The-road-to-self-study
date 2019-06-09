@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>电灯开关案例</title>
+
+
+</head>
+<body>
+
+    <img src="./img/off.gif" id="light_off">
+    <input type="button" id="btn" value="关闭当前页面">
+    <!--获取图片对象-->
+    <script>
+        var flag = false;
+
+        var fun = function (){
+
+            if (flag) {
+                off_light.src = "./img/off.gif";
+                flag = false;
+            } else {
+                off_light.src = "./img/on.gif";
+                flag = true;
+            }
+        };
+        //1.获取id为light_off的对象
+        var off_light = document.getElementById("light_off");
+        //2. 绑定事件，单击为执行函数fun
+        off_light.onclick = fun;
+
+        document.getElementById("btn");
+        btn.onclick = close_window;
+        function close_window() {
+            window.close()
+        }
+
+    </script>
+</body>
+</html>

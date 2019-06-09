@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>轮播图案例</title>
+</head>
+<body>
+
+    <img id="lunbo" src="./img/banner_1.jpg" width="100%">
+
+    <script>
+        var number = 0;
+        var lunbo = document.getElementById("lunbo");
+        function translate() {
+            number++;
+            if (number > 3) {
+                number = 1;
+            }
+            lunbo.src = "./img/banner_"+number+".jpg";
+
+        }
+        setInterval(translate,1000);
+
+    </script>
+</body>
+</html>

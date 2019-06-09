@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LocationDemo01</title>
+</head>
+<body>
+
+    <!--定义刷新 跳转百度 返回地址栏href的按钮-->
+    <input type="button" value="刷新" id="refresh">
+    <input type="button" value="百度" id="baidu">
+    <input type="button" value="返回地址栏" id="return_location">
+
+    <script>
+        var refresh = document.getElementById("refresh");
+        refresh.onclick = function() {
+            location.reload();
+        };
+
+        var baidu = document.getElementById("baidu");
+        baidu.onclick = function() {
+            location.href = "https://www.baidu.com";
+        };
+
+        var return_location = document.getElementById("return_location");
+        return_location.onclick = function() {
+            var href = location.href;
+            alert(href)
+        }
+    </script>
+
+</body>
+</html>

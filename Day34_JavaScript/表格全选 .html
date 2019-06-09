@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>表格全选</title>
+    <style>
+        table{
+            border: 1px solid;
+            width: 500px;
+            margin-left: 30%;
+        }
+
+        td,th{
+            text-align: center;
+            border: 1px solid;
+        }
+        div{
+            margin-top: 10px;
+            margin-left: 30%;
+        }
+
+    </style>
+
+    
+
+</head>
+<body>
+
+<table>
+    <caption>学生信息表</caption>
+    <tr onmouseover="move(this)" onmouseout="away(this)">
+        <th><input type="checkbox" ></th>
+        <th>编号</th>
+        <th>姓名</th>
+        <th>性别</th>
+        <th>操作</th>
+    </tr>
+
+    <tr onmouseover="move(this)" onmouseout="away(this)">
+        <td><input type="checkbox" ></td>
+        <td>1</td>
+        <td>令狐冲</td>
+        <td>男</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+
+    <tr onmouseover="move(this)" onmouseout="away(this)">
+        <td><input type="checkbox" ></td>
+        <td>2</td>
+        <td>任我行</td>
+        <td>男</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+
+    <tr onmouseover="move(this)" onmouseout="away(this)">
+        <td><input type="checkbox" ></td>
+        <td>3</td>
+        <td>岳不群</td>
+        <td>?</td>
+        <td><a href="javascript:void(0);">删除</a></td>
+    </tr>
+
+</table>
+<div>
+    <input type="button" id="selectAll" value="全选">
+    <input type="button" id="unSelectAll" value="全不选">
+    <input type="button" id="selectRev" value="反选">
+</div>
+
+    <script>
+        // 设置背景色，让鼠标在表格行上会变色，离开会变回白色
+        function move(obj) {
+            obj.setAttribute("bgcolor","pink");
+        }
+        function away(obj) {
+            obj.setAttribute("bgcolor","#FFFFFF");
+        }
+
+        // 设置全选按钮
+        function check_all() {
+            var input = document.getElementsByTagName("input");
+            for (var i = 0; i < input.length; i++){
+                input[i].checked = true; // .checked可以看到打勾的属性
+            }
+        }
+        var select_all = document.getElementById("selectAll");
+        select_all.onclick = check_all;
+
+        // 设置全不选按钮
+        function uncheck_all(){
+            var input = document.getElementsByTagName("input");
+            for (var i = 0; i< input.length;i++){
+                input[i].checked = false; // 把默认打勾删除
+            }
+        }
+        var unselect_all = document.getElementById("unSelectAll");
+        unselect_all.onclick = uncheck_all;
+
+        // 设置反选按钮
+        function check_rev() {
+            var input = document.getElementsByTagName("input");
+            for (var i = 0; i< input.length; i++) {
+                input[i].checked = !input[i].checked;
+            }
+        }
+        var selectRev = document.getElementById("selectRev");
+        selectRev.onclick = check_rev;
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HistoryDemo01</title>
+</head>
+<body>
+
+    <input id="back" type="button" value="后退">
+    <input id="forward" type="button" value="前进">
+    <input id="go" type="button" value="输入个数">
+
+    <script>
+        var back = document.getElementById("back");
+        back.onclick = function() {
+            history.back()
+        };
+
+        var forward = document.getElementById("forward");
+        forward.onclick = function() {
+            history.forward()
+        };
+
+        var go = document.getElementById("go");
+        go.onclick = function () {
+            var num = prompt("输入要去的页面");
+            history.go(num);
+        }
+    </script>
+</body>
+</html>

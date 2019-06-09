@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自动跳转首页</title>
+    <style>
+        p {
+            text-align:center;
+        }
+        span{
+            color: red;
+        }
+
+    </style>
+</head>
+<body>
+
+    <p>
+        <span id="number" >5</span>秒之后自动跳转首页...
+    </p>
+
+    <script>
+        var time = document.getElementById("number");
+        var number = 5;
+        function count_down() {
+            time.innerText = number;
+            number--;
+            if (number == -1) {
+                location.href = "https://www.baidu.com";
+                clearInterval(id);
+            }
+        }
+        var id = setInterval(count_down,1000);
+    </script>
+
+</body>
+</html>
