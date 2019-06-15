@@ -1,0 +1,161 @@
+1.HTTP
+2.Request
+
+
+
+
+
+
+一.HTTP协议
+    概念: Hyper Text Transfer Protocol  超文本传输协议
+        定义了客户端和服务端通信的时候，发送数据的格式
+        特点:
+        1. 基于TCP/IP的高级协议
+        2. 默认的端口号:80
+        3. 基于请求/响应的模型: 一次请求对应一次响应
+        4. 无状态: 每个请求之间相互独立，不能交互数据
+
+        历史版本：
+            1.0: 每一次请求响应都会创建一个新的连接
+            1.1: 对于每一次请求响应可以找回之前的连接进行请求响应，效率更快
+
+
+        对于请求数据的格式:
+            1.请求行:
+                格式: 请求方式 请求url 请求协议/版本
+                  如: GET /demo01 HTTP/1.1
+
+                请求方式:
+                    http中有7中请求方式，常用的有2种
+                    GET:
+                        1.请求参数在请求行中，在url后面
+                        2.url有长度限制
+                        3.不太安全
+                    POST:
+                        1.请求参数在请求体中
+                        2.没有长度限制
+                        3.较安全
+
+            2.请求头:
+                格式: 请求头名称:请求头值
+                两个较为重要的请求头:
+                    1.User-Agent: 浏览器告诉服务器，当前浏览器是哪个浏览器，使用的是什么版本
+                        然后就可以通过获取浏览器的头信息，来解决代码对不一样浏览器的兼容问题
+
+                    2.Referer: 就是从哪里进来的，告诉服务器从哪里访问到这个页面
+                        作用:
+                            1.防止别人的盗链
+                            2.统计请求数据的工作
+
+            3.请求空行
+                就是一个空行
+
+            4.请求体(请求数据)
+                名称1=值1&名称2=值2
+
+
+
+二.Request
+    1.Request对象和Response对象的原理
+        1.Request和Response对象是由服务器自动创建，我们可以进行使用
+        2.Request对象是来获取请求消息，Response对象是用来设置响应消息
+
+    整个流程:
+        1.浏览器解析url地址然后给tomcat,tomcat会根据url找到当前的类创建servlet对象
+        2.然后tomcat会创建request和response对象，
+        3.将请求消息统一包装在request对象中
+        4.然后将对象传入方法service中
+        5.然后就可以调用两个对象来接受请求和设置响应
+
+    Request: 获取请求消息
+        Request的对象继承体系结构
+            ServletRequest    接口
+                HttpServletRequest   也是接口
+                    org.apache.catalina.connector.RequestFacade 类(tomcat) 这个才是实现类，但是tomcat帮我们搞掂了
+
+
+
+        request对象功能:
+            1.获取请求消息数据:
+
+                用例子请求行: GET  day14/demo01?username=zhangsan HTTP/1.1
+
+                获取请求行的方法:
+                    1.获取请求方式:   String getMethod()
+                            获得: GET
+
+                    2.获取虚拟目录:   String getContextPath()
+                            获取: day14
+
+                    3.获取虚拟路径:   String getServletPath()
+                            获得:demo01
+
+                    4.获取Get方式的请求参数: String getQueryString()
+                            获得:username=zhangsan
+
+                    5.获取请求URI或者URL:
+                        URI:    String getRequestURI()
+                            URI: 统一资源标识符, day14/demo01
+                        URL:    StringBuffer getRequestURL()
+                            URL: 统一资源定位符: http://localhost:8080/day14/demo01
+
+                    6.获取协议版本:   String getProtocol
+                            获得: HTTP/1.1
+
+                    7.获取访问客户的IP地址:
+                        String getRemoteAddr()
+
+
+            2.获取请求头的数据:
+                String getHeader(String name) 根据请求头的名称获取值
+                    通过获取User-Agent,和Referer 就可以实现浏览器兼容和防盗链，判断就用字符串的方法 contains来判断是否有这个字符串
+
+                Enumeration<String> gerHeaderNames(): 获取所有请求头的名称
+                    枚举的对象使用两个方法来遍历:
+                        hasMoreElements() 判断对象中是否还有数据
+                        nextElement() 拿取下一个数据
+
+            3.获取请求体的数据:
+                只有POST请求方法中才会有请求体数据,在请求体中封装了请求参数
+
+                获取步骤:
+                    1.获取流对象:
+                        BufferReader getReader(): 获取字符输入流，只能操作字符数据
+                            多个数据会用 & 来连接
+                        ServletInputStream getInputStream: 获取字节输入流， 可以操作字节数据
+
+                    2.获取流对象的时候再使用流对象来操作数据
+
+
+        request的其他功能
+            1.通用获取数据参数的方法(就是get也可以用post也可以用)
+                String getParameter(String name):根据参数名称来获取参数值
+                String[] getParameterValues(String name): 根据参数名称来获取多个参数值返回数组
+                Enumeration<String> getParameterNames(): 获取所有的参数名称
+                Map<String String[]> getParameterMap(): 获取所有的参数然后存储在Map中
+
+                碰到中文乱码的问题：
+                get方法: tomcat自动解决
+                post方法: 在使用前设置请求的编码     request.setCharacterEncoding("编码集")
+
+
+            2.请求转发: 在服务器内部资源跳转的方式，就是访问demo01但是跳转到demo2中
+                1.通过request对象获取转发器对象: RequestDispatcher getRequestDispatcher(String path)
+                2.使用RequestDispatcher对象来转发request和response对象: forward(req,resp)
+
+                转发的特点:
+                    1.浏览器的地址栏不会发生改变
+                    2.只能转发到服务器的内部资源中
+                    3.转发只是一次请求
+
+
+            3.共享数据:
+                域对象: 一个作用域范围，可以在域对象的范围中共享数据，请求转发的对象们会创建一个域范围
+                request域: 代表一次请求的范围，一般用于请求转发多个资源中共享数据
+                方法:
+                    1.void setAttribute(String name, Object obj): 存储数据到域中
+                    2.Object getAttribute(String name): 通过键名称获取数据
+                    3.void removeAttribute(String name): 通过键名称去除数据
+
+            4. 获取ServletContext：
+            	ServletContext getServletContext()
