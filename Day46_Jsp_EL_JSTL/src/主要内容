@@ -1,0 +1,186 @@
+1.Jsp
+2.MVC模式
+3.EL表达式
+4.JSTL
+5.三层架构
+
+
+一.JSP:
+    之前已经学习过jsp了，就是用于在一个页面中可以写java代码也可以写html标签，用于简化书写
+
+    1.指令:
+        就是开头的<%@ 指令  %>那个东西，主要是用于到入资源文件的，配置jsp页面
+
+        格式: <%@ 指令名称  属性名1=属性值1 属性名2=属性值2 ...... %>
+
+        指令名称的分类:
+        page:       用于配置当前jsp页面，介绍一下属性值
+
+            1.contentType: 等同于response.contentType()
+                就是用来设置MIME类型和字符集的。
+                如果要设置当前页面的字符集，就需要用到 pageEncoding属性来设置
+
+            2.import: 就是导包的
+
+            3.errorPage: 当前页面发生错误的时候转发到这个属性对应的值的页面
+
+            4.isErrorPage: 表示当前页面是不是错误页面，如果值为true的话当前页面就是错误页面，可以用对象exception
+
+        include:    页面包含，就是当前jsp页面包含导入的页面
+            主要就是用于导入其他页面 <%@ include="页面资源路径" %>
+
+        taglib:     用于导入资源文件，类似于导jar包
+            类似于导第三方包  <%@ taglib prefix="自定义名称" uri="包路径"  %>
+
+
+    2.注释:
+        <!-- 注释内容 --> 只能注释html代码片段，并且在响应体会显示出来
+
+        <%-- 注释内容 --%> 可以注释所有的片段，在响应体不会显示
+
+    3.内置对象:
+        就是在jsp页面中可以直接使用的对象，不用创建的，一共9个内置对象
+
+        前四个都是共享域对象
+
+        变量名                     真实类型                     作用
+        pageContext               PageContext                 当前页面内的资源共享，并且可以获得其他八个内置对象
+        request                   HttpServletRequest          一次请求访问内的多个数据共享(转发)
+        session                   HttpSession                 一次会话中的多个数据共享(服务器)
+        application               ServletContext              整个servlet的资源共享
+        response                  HttpServletResponse         响应对象
+        out                       JspWriter                   相当于响应的输出流
+        page                      Object                      当前页面(Servlet)对象 相当于this
+        config                    ServletConfig               Servlet的配置对象
+        exception                 Throwable                   异常对象
+
+
+二.MVC
+
+    概念:
+        M:  Model(模型) javaBean
+            完成具体业务的操作的： 比如查询数据库，封装对象等
+
+        V:  View(视图) 用来 Jsp
+            主要是用来展示数据的
+
+        C:  controller(控制器) Servlet
+            获取用户的输入
+            调用模型
+            将获得的数据交给视图进行展示
+
+    优点:
+        1.各部分分工合作，耦合性低
+        2.东西做了出来，重用性高
+    缺点:
+        1.项目架构变得复杂，对开发人员要求就高了
+
+
+三.EL表达式
+    概念: Expression Language 表达式语言
+    作用: 替换和简化jsp页面的java语言的书写
+    语法: ${表达式}
+    注意:
+        jsp默认支持el表达式的。如果要忽略el表达式
+    		1. 设置jsp中page指令中：isELIgnored="true" 忽略当前jsp页面中所有的el表达式
+    		2. \${表达式} ：忽略当前这个el表达式
+
+    EL表达式的使用方法:
+        1.里面可以加运算
+            运算符
+				1. 算数运算符： + - * /(div) %(mod)
+				2. 比较运算符： > < >= <= == !=
+				3. 逻辑运算符： &&(and) ||(or) !(not)
+				4. 空运算符： empty
+					功能：用于判断字符串、集合、数组对象是否为null或者长度是否为0
+					${empty list}:判断字符串、集合、数组对象是否为null或者长度为0
+					${not empty str}:表示判断字符串、集合、数组对象是否不为null 并且 长度>0
+
+        2.还可以在里面获取值，返回页面的是最终得到的值
+            el表达式只能从域中获取值
+
+            语法:
+                1.${域名称.键名称} 从指定域中获取指定的键名所对应的值
+                    域名称:
+                        1.pageScope         --> PageContext
+                        2.requestScope      --> HttpServletRequest
+                        3.sessionScope      --> Session
+                        4.applicationScope  --> ServletRequest
+                        比如，在request域中存储了("zhangsan","1234")
+                        ${requestScope.zhangsan} == "1234"
+
+                2.${键名} 范围从小的大的寻找，找哪个域有对应键名，直到找到为止，找不到就返回空字符串
+
+
+                3.如果，键值对中，值为对象,List集合,Map集合值的方法
+                    1.获取对象的值
+                        ${域名称.键名.属性名}   属性就是getter的方法，去掉get，然后字母小写，本质上会去调用getter方法
+
+                    2.获取List集合的值的方法
+                        ${域名称.键名[int index]} 可以根据传入的索引获取对应的值
+
+                    3.获取Map集合的值的方法
+                        ${域名称.键名.key名称} 就可以获取相对应的value
+                        ${域名称.键名["key名称"]}
+
+        3.EL表达式的隐式对象
+            el表达式一共有11个隐式对象
+            pageContext:
+                可以获取jsp中其他八个内置对象
+                    ${pageContext.request.contextPath} 可以获取本页面的动态目录
+
+
+四.JSTL
+    1.概念 JavaServer Pages Tag Library  JSP标准标签库
+         是由Apache组织提供的开源的免费的jsp标签
+
+    2.和el表达式一样用于简化jsp页面上的java代码
+
+    3.使用步骤
+        在工程导入jar包
+        在<%@ taglib %> 指令中也导入
+        使用标签
+
+    4.常用的JSTL标签
+        1.if   相当于java中的if
+            <c:if text=""> 标签体 </c:if>,text的值多数为表达式，true的话就显示标签体内容，false的话就不显示标签体内容
+
+        2.choose 相当于java中的switch
+             <c:choose>
+                <c:when test=""> </c:when>
+                <c:otherwise> </c:otherwise>
+             </c:choose>
+
+             相当于
+             switch(变量){
+                case(值1):{}
+                case(值2):{}
+                default:{}
+             }
+            test多用于el表达式
+
+        3.foreach 相当于java中的for循环
+            1.完成重复的操作
+                以下属性:
+                begin:开始值
+                end:结束值
+                step:步长
+                var:临时变量
+                varStatus: 循环状态对象
+                    属性: index: 容器中元素的索引，默认为0
+                          count: 循环的次数，1开始
+
+            2.遍历容器
+                items:容器对象
+                var:临时变量
+                varStatus:循环状态对象
+                    属性: index: 容器中元素的索引
+                         count: 循环的次数
+
+
+
+五.三层架构
+    软件设计架构
+    	1. 界面层(表示层)：用户看的得界面。用户可以通过界面上的组件和服务器进行交互
+    	2. 业务逻辑层：处理业务逻辑的。
+    	3. 数据访问层：操作数据存储文件。
