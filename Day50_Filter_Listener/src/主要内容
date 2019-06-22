@@ -1,0 +1,121 @@
+1.Filter
+2.Listener
+
+
+
+
+
+一.Filter
+    Filter就是过滤器的意思，主要是用于过滤连接的访问
+
+    如: 一个请求想要找资源一，但是资源一的路上有过滤器，得先经过过滤器的同意才能找资源一
+
+    一般是用于某些通用的操作。在过滤器可以对请求进行操作之后再放行
+
+    2.快速入门
+        1.步骤:
+            1. 定义一个类，实现接口Filter
+            2. 复写接口的方法
+            3. 配置拦截路径
+                web.xml: 中配置如下
+                <filter>
+                    <filter-name>demo01</filter-name>
+                    <filter-class>web.Filter.filterDemo01</filter-class>
+                </filter>
+
+                <filter-mapping>
+                    <filter-name>demo01</filter-name>
+                    <url-pattern>/*</url-pattern>
+                </filter-mapping>
+                注解配置: 配置的是拦截路径
+
+
+    3.过滤器的各种问题
+        1.过滤器的执行流程
+            如:一个人从去找资源1，中间有过滤器，先通过过滤器，然后找到资源一，再返回，又通过过滤器，然后回家
+                1.执行过滤器
+                2.过滤器放行,执行放行过后的资源
+                3.执行完了回来执行过滤器放行下面的代码
+
+        2.过滤器的生命周期方法
+            1.init: 服务器启动后，创建Filter对象，调用init方法，只调用一次
+            2.doFilter: 每一次拦截资源的时候都会调用
+            3.destroy: 当服务器正常关闭，Filter资源被销毁后就会执行
+
+        3.过滤器配置详解:
+            1.拦截路径配置
+                1.拦截具体资源路径: /index.jsp      只拦截index.jsp
+                2.拦截所有资源: /*                  拦截所有
+                3.拦截目录下的资源: /user/*         拦截user目录下的所有
+                4.拦截后缀名的资源: *.jsp           拦截所有jsp资源
+
+            2.拦截方式配置: 资源以xx方式被访问的时候就会被拦截
+                注解配置:
+                    设置dispatcherType的属性
+                    1.REQUEST: 默认拦截所有方式
+                    2.FORWARD: 拦截转发访问
+                    3.INCLUDE: 拦截包含访问
+                    4.ERROR:   拦截错误跳转
+                    5.ASYNC:   拦截异步访问
+
+                web.xml配置:
+                    在下面设置<dispatcher> 上面五种 </dispatcher>
+
+        4.过滤器链(多个过滤器的时候)
+            1.注解配置: 根据字符串的比较规则，来比较类名称，看那个值更小，就先执行
+
+            2.web.xml配置: <filter-mapping> 谁定义在上边，谁就先执行
+
+
+    4.动态代理:
+        是一个设计模式，一些通用的固定的解决问题的方法
+
+        例子: 我可以使用代理对象来完成真是对象中的某些功能，并且可以增强真实对象中的功能
+
+        概念:
+            1.真实对象: 就是最先的对象，被代理的对象
+            2.代理对象
+            3.代理模式: 就是使用代理对象代理真是对象，可以增强真实对象的功能
+
+        实现方式:
+            1.静态代理: 创建一个类来描述代理模式
+            2.动态代理: (具体方法看proxydemo01源码)
+                1.代理对象和真实对象实现同一个接口
+                2.代理对象 = Proxy.newProxyInstance()
+                3.使用代理对象中的代码块调用方法
+                4.自定义增强方法
+
+        增强方法: (可以在重构invoke方法中，对以下的方式进行增强)
+            1.可以增强传入的参数
+            2.可以增强返回值
+            3.可以增强内部的代码
+
+
+二.Listener 监听器
+    web三大组件之一
+        事件的监听机制:
+            事件: 就是一件事情
+            事件源: 事件发生的地方
+            监听器:一个对象
+            注册监听: 把监听器 事件源事件绑定在一起，然后上面的事件发生了之后，就执行监听器的代码
+
+
+    Listener web的大三组件之一的监听器，主要是使用一个类，然后实现 ServletContextListener接口重写方法
+        void contextDestroyed(ServletContextEvent sce): ServletContext对象被销毁之后调用的方法
+        void contextInitialized(ServletContextEvent sce): ServletContext对象被创建后就会执行这个方法
+
+
+    步骤
+        1.定义一个类，实现ServletContextListener接口，然后重写方法
+
+        2.传入的sce对象可以获取ServletContext对象,就可以配置全局，加载全局资源
+
+        3. 配置
+        	web.xml
+        		<listener>
+             	    <listener-class>cn.itcast.web.listener.ContextLoaderListener</listener-class>
+           		</listener>
+
+        		指定初始化参数<context-param> 指定这个可以加载其他xml，初始化参数
+        	2. 注解：
+        	    * @WebListener
