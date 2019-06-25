@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script  src="../jquery-3.3.1.min.js"></script>
+		<script>
+			$(function () {
+
+				//设置的话就直接在方法括号里面传值就行了
+
+               // 获取 myinput 的value值
+				alert($("#myinput").val());
+
+				//获取mydiv 的 标签体内容
+				alert($("#mydiv").html());
+
+				// 获取mydiv的文本内容
+				alert($("#mydiv").text());
+
+            });
+
+		</script>
+		
+	</head>
+	<body>
+		<input id="myinput" type="text" name="username" value="张三" /><br />
+		<div id="mydiv"><p><a href="#">标题标签</a></p></div>
+	</body>
+</html>
