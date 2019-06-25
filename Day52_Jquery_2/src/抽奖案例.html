@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>jquery案例之抽奖</title>
+    <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+
+    <script>
+
+        // 把number单独定义
+        var number;
+        // 定义一个函数，产生随机数，随机获取数组图片，改变src索引
+        function changeimg() {
+
+            // 产生一个0到6的随机整数
+            number = Math.ceil(Math.random() * 6);
+
+            $("#img1ID").prop("src",imgs[number]);
+        }
+
+        var interid; // 定义的是计时器的返回值
+        // 分析，先给小按钮和大按钮绑定单击事件
+        function startid() {
+
+            interid = setInterval(changeimg,30);
+
+        }
+
+
+        function endid() {
+            // 清空定时器
+            clearInterval(interid);
+
+            // 给大相框的src修改值
+            $("#img2ID").prop("src",imgs[number]);
+
+        }
+    </script>
+</head>
+<body>
+
+<!-- 小像框 -->
+<div style="border-style:dotted;width:160px;height:100px">
+    <img id="img1ID" src="img/man00.jpg" style="width:160px;height:100px"/>
+</div>
+
+<!-- 大像框 -->
+<div
+        style="border-style:double;width:800px;height:500px;position:absolute;left:500px;top:10px">
+    <img id="img2ID" src="img/man00.jpg" width="800px" height="500px"/>
+</div>
+
+<!-- 开始按钮 -->
+<input
+        id="startID"
+        type="button"
+        value="点击开始"
+        style="width:150px;height:150px;font-size:22px"
+        onclick="startid()">
+
+<!-- 停止按钮 -->
+<input
+        id="stopID"
+        type="button"
+        value="点击停止"
+        style="width:150px;height:150px;font-size:22px"
+        onclick="endid()">
+
+
+<script language='javascript' type='text/javascript'>
+    //准备一个一维数组，装用户的像片路径
+    var imgs = [
+        "img/man00.jpg",
+        "img/man01.jpg",
+        "img/man02.jpg",
+        "img/man03.jpg",
+        "img/man04.jpg",
+        "img/man05.jpg",
+        "img/man06.jpg"
+    ];
+
+</script>
+</body>
+</html>

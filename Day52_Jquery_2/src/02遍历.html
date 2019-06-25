@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+
+
+        $(function () {
+            var citys = $("#city li");
+
+            //普通js的遍历
+            /*
+            for (var i = 0; i < citys.length; i++){
+                alert(i + ":" + citys[i].innerHTML);
+            }
+             */
+
+            // 使用JQuery的each遍历
+            /*
+            citys.each(function (index,element) {
+                alert(index + ":" + element.innerHTML);
+            })
+             */
+
+            // 使用3.0以上的for of 遍历
+            /*
+            for (city of citys) {
+                alert(city.innerHTML);
+            }
+             */
+
+            // JQuery中的each循环，执行continue和break
+            citys.each(function (index, element) {
+                if (element.innerHTML == "上海"){
+                    return true; // 返回true 相当于 让循环continue, false的话就相当于break
+                }
+                alert(index + ":" + element.innerHTML);
+            })
+        });
+
+    </script>
+</head>
+<body>
+<ul id="city">
+    <li>北京</li>
+    <li>上海</li>
+    <li>天津</li>
+    <li>重庆</li>
+</ul>
+</body>
+</html>

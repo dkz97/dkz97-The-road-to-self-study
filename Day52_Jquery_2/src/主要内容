@@ -1,0 +1,97 @@
+1.Jquery
+    1.动画
+    2.遍历
+    3.时间绑定
+    4.插件
+
+
+
+
+一.动画
+    1.三种动画的方式来显示和隐藏元素
+
+        动画的方式参数都一样，都是三个参数，参数的解释
+            speed: 显示与隐藏的速度，三个预定义的值("slow","normal","fast")或者自定义毫秒值("xxx")
+            easing: 指定切换的效果，默认"swing",可用"linear"
+                * swing: 动画执行的效果 开头慢，中间快，结尾慢
+                * linear: 动画执行的效果 全程匀速
+            fn: 自定义函数，在动画完成的时候执行的函数，每个元素都会执行一次
+
+        1.默认的显示和隐藏方式
+            1.show([speed,[easing],[fn]])
+            2.hide
+            3.toggle
+
+        2.滑动显示和隐藏方式
+            1.slideDown
+            2.slideUp
+            3.slideToggle
+
+        3.淡入淡入的显示和隐藏方式
+            1.fadeIn
+            2.fadeOut
+            3.fadeToggle
+
+
+二.遍历
+    1.js的遍历方式:
+        和java差不多，都是for循环遍历
+
+    2.JQuery的遍历
+
+        each 会自己遍历jq对象，传参可以写可以不写，写了就能调用，回调函数就是each已经自己遍历了，可以在自定义的函数中执行自己的代码
+
+        1.jq对象.each(callback)
+            语法:
+                JQuery对象.each( function(index,element){})
+                    index: 集合中遍历的索引
+                    element: 集合中的每一个对象
+
+                    this: 也是集合中的每一个对象
+
+                回调函数的返回值
+                    true: 如果当前function返回true 的话，就结束本次循环进行下一次，相当于for中的Continue
+                    false: 如果当前function 返回false的话，就结束循环，相当于break
+
+        2.$.each(object,[fn])
+            全局循环，主要是传入的Object 可以是jquery对象也可以是js对象
+
+        3.for .. of (3.0以上版本)
+            相当于增强for循环
+            for (变量名 of 遍历体) { 代码块}
+
+
+
+三.事件绑定
+    1.标准绑定方式
+        JQuery对象.事件方法(回调函数):
+            注意:
+                1.如果调用事件方法，不传入回调函数的话，会自动指定浏览器默认的行为
+
+    2.on绑定事件/off解除事件
+        JQuery对象.on("事件名称",回调函数)
+        JQuery对象.off("事件名称")
+            如果off不传递参数，默认删除所有事件
+
+    3.事件切换:toggle
+        JQuery对象.toggle(fn1,fn2...)
+            当单击jq对象的时候，按顺序执行fn1,fn2..然后再执行回fn1
+
+            注意：1.9版本 .toggle() 方法删除, 引入jQuery Migrate（迁移）插件可以恢复此功能。
+
+
+
+四.插件:   增强JQuery的功能
+    1. 实现方式：
+    	1. $.fn.extend(object)
+    	    语法:
+    	        $.fn.extend({方法名称1:function1,方法名称2:function2,...})
+
+    	    里面定义的方法可以让所有的jq对象都使用,是用来增强jquery对象的
+
+    		* 增强通过Jquery获取的对象的功能   $("#id") jq对象来调用的方法
+
+    	2. $.extend(object)
+    	    可以用来增强$或者全局对象
+
+    		* 增强JQeury对象自身的功能  $/jQuery  $对象来调用的方法

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            // 绑定单击事件
+            $("#name").click(function () {
+                alert("我点击了...");
+            });
+
+            // 鼠标移动到元素上方的时候
+            $("#name").mouseover(function () {
+                alert("我来了...")
+            });
+
+            // 鼠标移出元素上方
+            $("#name").mouseout(function () {
+                alert("我走了...")
+            });
+        });
+
+
+    </script>
+</head>
+<body>
+<input id="name" type="text" value="绑定点击事件">
+</body>
+</html>
