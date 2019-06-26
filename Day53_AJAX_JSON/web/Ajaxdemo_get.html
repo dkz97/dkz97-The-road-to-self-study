@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jquery的方式实现Ajax，使用$.get()方法</title>
+    <script src="js/jquery-3.3.1.min.js"></script>
+
+    <script>
+
+        // 使用$.get()方法来实现Ajax，参数有四个，url，请求的data，回调函数,响应的data类型
+        /*
+        $.get("/day53/jsAjaxServlet",{"username":"zhangsan"},function (data) {
+            alert(data);
+        },"text");
+
+         */
+
+        $.post("/day53/jsAjaxServlet",{"username":"zhangsan"},function (data) {
+            alert(data);
+        },"text");
+
+    </script>
+</head>
+<body>
+
+
+
+</body>
+</html>

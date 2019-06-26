@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jquery实现Ajax，使用$.ajax</title>
+    <script src="js/jquery-3.3.1.min.js" ></script>
+
+    <script>
+
+        $.ajax({
+            url:"/day53/jsAjaxServlet",
+            type:"POST",
+            data:{"username":"zhangsan","password":"123456"},// 这个是json的模式写法，也可以写成username=123&password=123
+            // success:callback 这个是回调函数，返回的data是服务器返回的内容
+            success:function (data) {
+                alert(data)
+            }
+        })
+
+    </script>
+</head>
+<body>
+
+
+
+</body>
+</html>

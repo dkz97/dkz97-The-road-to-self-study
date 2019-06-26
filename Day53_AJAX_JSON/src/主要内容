@@ -1,0 +1,144 @@
+1.AJAX
+2.JSON
+
+
+
+
+
+一.AJAX
+    AJAX的概念: AJAX用来对页面进行部分请求的，因为如果在平常的时候，客户端发送请求到服务器端，这段时间客户端不能做任何事情
+        只能等服务器端执行完毕返回后客户端才可以执行，但是使用AJAX的话，页面的部分发送请求到服务器端的时候，客服端还是可以进行
+
+        AJAX: ASynchronous JavaScript and XML 就是异步的javaScript和xml
+
+        同步:客户端必须等待服务端响应之后才可以进行下一步操作
+        异步: 客户端不需要等待服务端响应，在服务端响应的同时客户端也可以执行自身的操作
+
+        Ajax 是无需重新加载整个页面，就可以更新部分网页的技术
+
+        不实用Ajax的网页，如果要更新内容则必须要更新整个网页
+
+
+    实现的方式:
+        1.原生JS代码实现的方式:
+            1. 创建核心对象 xmlhttp,并且有固定判断创建
+            2. 建立连接     xmlhttp.open(method,url,同步还是异步)
+            3. 发送请求     xmlhttp.send(参数键值对)
+            4. 接受并且处理服务器的响应结果
+
+        2.使用JQuery的方式来实现
+            1. $.ajax()
+                ajax()括号里面的参数可以去查文档，主要语法是
+                $.ajax({
+                    url:"xx",
+                    type:"POST/GET",
+                    data:{"xxx":"xxx",.....},
+                    success:回调函数,执行成功的时候调用的回调函数
+                    error:回调函数,执行失败的时候调用的回调函数
+                    dataType: "xx" 设置接收到响应数据的格式text 或者Json或者其他
+                })
+
+            2. $.get()
+                语法: $.get(url,请求data,回调函数,响应的结果类型)
+
+            3. $.post()
+                 语法：$.post(url, [data], [callback], [type])
+                	参数：
+                		* url：请求路径
+                		* data：请求参数
+                		* callback：回调函数
+                		* type：响应结果的类型
+
+            注意:
+            1. 服务器响应的数据，在客户端使用时，要想当做json数据格式使用。有两种解决方案：
+            	1. $.get(type):将最后一个参数type指定为"json"
+            	2. 在服务器端设置MIME类型
+            		response.setContentType("application/json;charset=utf-8");
+
+
+
+
+二.JSON
+    概念: JavaScript Object Notation      JavaScript对象表示法
+
+        举个例子，对与对象来说的话
+        Person p = new Person();
+        p.setName("张三");
+        p.setAge(23);
+
+        Json的表达形式就是:
+        var p = {"name":"zhangsan","age":23};
+
+    用途:
+        JSON是经常用于存储，和信息交互的格式语法
+        可以进行数据的传输
+        比xml更小，传输速度更快
+
+    语法:
+        1.基本规则
+            是由键值对来组成的 {key:value,key:value....}
+
+            键可以用引号，也可以不用引号(最好统一)
+
+            值的类型:
+                1.数字
+                2.字符串
+                3.boolean
+                4.数组    {key:[],key2:[]}
+                5.对象    {key:{},key:{}}
+                6.null
+
+            键值对之间由冒号分割，键值对与键值对使用逗号分割
+
+
+        2.获得数据:
+            1. json对象.键名
+            2. json对象["键名"]
+            3. 如果值是数组对象，就数组对象[索引]
+
+            4.遍历
+                使用for in 循环
+                for (var key in Json对象){
+                    获取的是一个json对象的key值的字符串形式
+
+                    value = json对象[key]
+                }
+
+
+    Json对象和java对象互换
+
+        概念:通常要使用Json解释器，解释器主要有:sonlib，Gson，fastjson，jackson，然而我们用jackson
+
+
+        1.Json对象转为java对象
+            1.导入jackson的jar包
+            2.创建jackson的核心对象 ObjectMapper
+            3.调用核心对象的方法 readValue(json字符串数据,Class)， 就可以把json字符串数据转换成class对象
+
+
+        2.java对象转为Json对象
+            1.步骤
+                a.导入jackson的jar包
+                b.创建核心对象 ObjectMapper
+                c.调用核心对象的方法来将java对象转换为json对象
+
+                    转换方法有:
+
+                    writeValue(参数1,obj)
+                    参数1：
+                        File：将obj对象转换为JSON字符串，并保存到指定的文件中
+                        Writer：将obj对象转换为JSON字符串，并将json数据填充到字符输出流中
+                        OutputStream：将obj对象转换为JSON字符串，并将json数据填充到字节输出流中
+
+                    writeValueAsString(obj) 转换成json的字符串形式
+
+
+                2. 注解：
+                    1. @JsonIgnore：在属性上面加这个的话，json就会排除这个属性不管他
+                	2. @JsonFormat：属性值得格式化
+                	    * @JsonFormat(pattern = "yyyy-MM-dd")
+
+                3. 复杂java对象转换
+                    1. List：数组 就是数组 [元素1,元素2]
+                	2. Map：对象格式一致 {元素1,元素2,元素3}
+

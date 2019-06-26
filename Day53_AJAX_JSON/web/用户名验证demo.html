@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户名验证demo</title>
+    <script src="js/jquery-3.3.1.min.js"></script>
+
+    <script>
+
+        $(function () {
+
+            // 给用户名输入框创建一个失去焦点的事件，失去焦点之后就会发送AJAX请求，去对比数据库是否有这个用户名
+            $("#username").blur(function () {
+                // 获取文本输入框的值，就是获取value的值
+                var username = $(this).val();
+
+                // 发送ajax请求,在回调函数中进行操作
+                // data的是回调的东西，就是url对象响应回来的东西，字符串的形式
+                $.get("/day53/verifyServlet",
+                    {"username": username},
+                    function (data) {
+                        alert(data.userExist);
+                        if (data.userExist) {
+                            // 用户名存在的时候返回的信息
+                            $("#textUsername").html(data.msg)
+                        } else {
+                            $("#textUsername").html(data.msg)
+                        }
+                    },
+                    "json"); //定义这个json，为的就是data返回的是json类型
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+    <form action="#" method="get">
+        <input type="text" placeholder="请输入用户名" id="username" name="username"><span id="textUsername"></span>
+        <input type="password" id="password" name="password" placeholder="请输入密码">
+        <input type="submit" value="注册">
+    </form>
+
+</body>
+</html>

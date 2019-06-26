@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS原生对象实现AJAX</title>
+    <script>
+
+        // 创建核心对象
+        var xmlhttp;
+        // 主要是用来判断是哪个版本的浏览器，然后进行不一样的对象创建
+        if (window.XMLHttpRequest)
+        {// code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        }
+        else
+        {// code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        // 建立连接
+            /*
+            *   一共有三个参数:1.请求方式 2.请求的url 3.请求是异步还是同步，true为异步
+            *   1.请求方式:
+            *       POST,GET
+            *   2.请求url: 如果是GET请求方式的话就在url后面加上键值对
+            *   3.同步还是异步
+            * */
+        xmlhttp.open("GET","/day53/jsAjaxServlet?username=zhangsan",true);
+
+        //发送连接, 如果是POST请求的话就需要在send中输入键值对
+        xmlhttp.send();
+
+        // 然后就可以接受并且处理服务器的响应结果,以下都为固定代码
+        xmlhttp.onreadystatechange=function()
+        {
+            //判断readyState就绪状态是否为4，判断status响应状态码是否为200
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+                //获取服务器的响应结果
+                var responseText = xmlhttp.responseText;
+                alert(responseText);
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+
+
+
+</body>
+</html>
