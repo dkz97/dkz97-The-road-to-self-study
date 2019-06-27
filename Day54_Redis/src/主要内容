@@ -1,0 +1,263 @@
+1.Redis
+    1. 概念
+    2. 下载安装
+    3. redis的命令操作
+    4. 持久化保存
+
+    注意:对于redis来说，缓存的数据都应该是不经常变化的数据
+        如果数据发生变化，就需要清空redis然后再存入新的数据
+
+2.Jedis
+    1.使用步骤
+    2.Jedis连接池
+
+
+
+
+
+
+一.Redis
+    1.概念:
+        一个高性能的NOSQL，就是非关系型数据库，
+
+        NOSQL:  意思就是"不仅仅是sql" 全新的数据库理念，非关系型数据库，就是数据量大的时候如果再去与硬盘找数据的话，那速度就太慢了
+            所以可以在内存中进行缓存数据，这样速度就会快得多，主要是用于存储短时间内不经常发生改变的数据，查询的时候可以直接在内存里面读取数据
+
+        关系型数据库与NoSQL数据库并非对立而是互补的关系，即通常情况下使用关系型数据库，在适合使用NoSQL的时候使用NoSQL数据库，
+        让NoSQL数据库对关系型数据库的不足进行弥补。
+        一般会将数据存储在关系型数据库中，在nosql数据库中备份存储关系型数据库的数据
+
+
+    2.主流的NOSQL产品
+    	•键值(Key-Value)存储数据库
+            相关产品： Tokyo Cabinet/Tyrant、Redis、Voldemort、Berkeley DB
+    		典型应用： 内容缓存，主要用于处理大量数据的高访问负载。
+            数据模型： 一系列键值对
+            优势： 快速查询
+            劣势： 存储的数据缺少结构化
+        •列存储数据库
+            相关产品：Cassandra, HBase, Riak
+            典型应用：分布式的文件系统
+            数据模型：以列簇式存储，将同一列数据存在一起
+            优势：查找速度快，可扩展性强，更容易进行分布式扩展
+            劣势：功能相对局限
+        •文档型数据库
+            相关产品：CouchDB、MongoDB
+            典型应用：Web应用（与Key-Value类似，Value是结构化的）
+            数据模型： 一系列键值对
+            优势：数据结构要求不严格
+            劣势： 查询性能不高，而且缺乏统一的查询语法
+        •图形(Graph)数据库
+            相关数据库：Neo4J、InfoGrid、Infinite Graph
+            典型应用：社交网络
+            数据模型：图结构
+            优势：利用图结构相关算法。
+            劣势：需要对整个图做计算才能得出结果，不容易做分布式的集群方案。
+
+
+    3.什么是Redis:Redis是用C语言开发的一个开源的高性能键值对（key-value）数据库，
+        Redis通过提供多种键值数据类型来适应不同场景下的存储需求，目前为止Redis支持的键值数据类型如下
+            1.字符串类型 String
+            2.哈希类型  Hash 相当于(map)
+            3.列表类型  List 相当于(LinkedList)
+            4.集合类型  Set  相当于(HashSet,不可重复)
+            5.有序集合类型 sortedSet (有顺序的HashSet)
+
+
+        redis的应用场景
+            •	缓存（数据查询、短连接、新闻内容、商品内容等等）
+            •	聊天室的在线好友列表
+            •	任务队列。（秒杀、抢购、12306等等）
+            •	应用排行榜
+            •	网站访问统计
+            •	数据过期处理（可以精确到毫秒
+            •	分布式集群架构中的session分离
+
+    4.redis下载安装
+        1.官网直接下载解压
+            mac客户端中
+
+            redis-server  启动redis服务器端
+            redis.conf  redis的配置文件
+            redis-cli  redis的命令行
+            redis-cli shutdown， 关闭redis
+            redis-cli -h ip地址 -p 端口号 进入到redis中
+
+
+    5.redis的命令行操作
+        1.redis的值的数据结构
+            redis的存储的数据结构是: key,value，其中key都是字符串，value有以下五个值
+                value的数据结构：
+                    1) 字符串类型 string
+                    2) 哈希类型 hash ： map格式
+                    3) 列表类型 list ： linkedlist格式。支持重复元素
+                    4) 集合类型 set  ： 不允许重复元素
+                    5) 有序集合类型 sortedset：不允许重复元素，且元素有顺序
+
+
+        2.字符串类型：
+            1.存储
+                set key value
+            2.获取
+                get key
+            3.删除
+                del key
+
+        3.哈希类型
+
+            因为值是map集合，所以map也有Key和value，field相当于map中的key
+            1.存储
+                hset key field value
+            2.获取
+                hget key field
+                    获取指定的key对应的field值
+                hgetall key
+                    获取指定的key中所有的值
+            3.删除
+                hdel key field
+
+
+        4.列表类型
+
+            1.存储
+                lpush key value: 在列表最左边加一个元素
+                rpush key value: 在列表最右边加一个元素
+
+            2.获取
+                lrange key start end: 范围获取，根据开始和结束获取元素
+
+            3.删除
+                lpop key: 在最左边弹出一个元素，返回元素
+                rpop key: 在最右边弹出一个元素，返回元素
+
+
+        5.集合类型(不允许有重复)
+            1.存储
+                sadd key value: 增加一个元素，没有顺序的
+
+            2.获取
+                smembers key: 获取key中的所有元素
+
+            3.删除
+                srem key value: 删除key中的某个元素
+
+        6.有序集合类型
+            1.存储
+                zadd key score value: 给key增加一个元素，然后给予一定的分值，到时候根据分值来进行元素的排序
+
+            2.获取
+                zrange key start end [withscores]:  根据范围进行元素的获取，如果给定withscores，元素就会展示分数
+
+            3.删除
+                zrem key value: 删除key中的某个元素
+
+        7.通用命令
+            1.获取redis中的所有的key
+                key *   (*可以是正则表达式)
+
+            2.获取键对应的value值
+                type key:
+
+            3.删除指定的key 和value
+                del key:
+
+
+
+
+    6.Redis的持久化存储
+        1.Redis是一个内存数据库，当关闭redis的时候，数据就会丢失，我们可以配置文件，将redis的内存的数据永久存储到硬盘中
+
+        2.redis的持久化机制
+            1.RDB:  默认的方式，
+                在一定的间隔时间中，检测key的数量的变化情况，来进行持久化的存储数据
+                    1.编辑redis的配置文件 redis.conf
+                        有三个以下的配置
+                        #   after 900 sec (15 min) if at least 1 key changed
+                        save 900 1
+                        #   after 300 sec (5 min) if at least 10 keys changed
+                        save 300 10
+                        #   after 60 sec if at least 10000 keys changed
+                        save 60 10000
+                    2.启动redis的时候指定配置文件就行: redis-server redis.conf
+
+            2.AOF: 用日志来存储的方式，可以记录每一条操作，每操作一次就记录一次
+                1. 编辑redis.conf文件
+                    appendonly no（关闭aof） --> appendonly yes （开启aof）
+
+                    # appendfsync always ： 每一次操作都进行持久化
+                    appendfsync everysec ： 每隔一秒进行一次持久化
+                    # appendfsync no	 ： 不进行持久化
+
+
+
+
+
+
+二.Jedis
+    概念:是一个工具，用来在java中操作redis的工具
+
+    使用步骤:
+        1.下载jedis的jar包
+
+        2.获取连接
+            Jedis jedis = new Jedis("ip地址","port号")
+        3.操作
+
+        4.关闭连接
+            jedis.close()
+
+
+    基本语法:
+        1) 字符串类型 string
+            1. 获取连接
+            Jedis jedis = new Jedis(); 如果使用空参构造，默认值 "localhost",6379端口
+
+            存储
+            jedis.set("username","zhangsan");
+            获取
+            String username = jedis.get("username");
+
+            可以使用setex()方法存储可以指定过期时间的 key value
+            jedis.setex("activecode",20,"hehe");
+                将activecode：hehe键值对存入redis，并且20秒后自动删除该键值对
+
+            3. 关闭连接
+            jedis.close();
+
+        2) 哈希类型 hash ： map格式
+            hset(key,field,value)
+            hget(key,field)
+            hgetAll(key)
+            hdel(key field)
+
+
+
+        3) 列表类型 list ： linkedlist格式。支持重复元素
+            lpush / rpush (左添加右添加)
+            lpop / rpop     (左弹出和右弹出)
+            lrange start end : 范围获取
+
+
+        4) 集合类型 set  ： 不允许重复元素
+            sadd(key,values)
+            smembers(key):获取所有元素
+
+        5) 有序集合类型 sortedset：不允许重复元素，且元素有顺序
+            zadd
+            zrange
+
+
+    jedis连接池： JedisPool
+
+        步骤:
+            1.创建一个配置对象
+                JedisPoolConfig
+                可以使用对象来调用方法
+                    .setMaxTotal()
+                    .setMaxIdle()
+            2.创建连接池对象  new JedisPool()， 可以在创建的时候传入配置对象
+            4.获取连接  连接池对象.getResource()
+            5.关闭连接，归还到连接池
+
+
+

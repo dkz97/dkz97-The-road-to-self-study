@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>省份案例</title>
+    <script src="js/jquery-3.3.1.min.js"></script>
+
+    <script>
+
+
+        $(function () {
+
+            $.get("/day54/caseDemoServlet",function (data) {
+
+                // 遍历接收回来的data
+                //{"id":1,"name":"广东"},{"id":2,"name":"北京"},{"id":3,"name":"广州"},{"id":4,"name":"陕西"}]
+                $(data).each(function (index, element) {
+                    var option = "<option name='"+ element.id +"'>" + element.name+ "</option>";
+
+                    // 给选择框追加元素
+                    $("#province").append(option);
+                })
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+<!-- 下啦列表可以加载所有省份 -->
+
+    <form action="#" method="get">
+        <select id="province">
+            <option>请选择</option>
+        </select>
+    </form>
+
+</body>
+</html>
