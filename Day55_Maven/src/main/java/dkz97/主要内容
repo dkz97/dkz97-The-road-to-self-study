@@ -1,0 +1,77 @@
+一.Maven
+    1.概念：
+        一个项目的管理工具，主要是用来管理项目模型的，并且可以远程配置jar来使用一些特定的端口来调用jar包
+
+
+    Maven的依赖管理:
+        不将jar包存在项目当中，在项目中有一个pom.xml，需要导入jar包的时候可以在pom.xml中加入jar包的坐标，项目运行的时候就会在pom.xml中找到jar包的坐标从仓库中找到jar包
+
+    项目的一键构建：
+        有六个阶段，每个阶段都有不同的插件，并且有不同的命令
+        清理      编译      测试      报告      打包      部署
+        clean    complie   test               package   install
+
+
+    可以自行部署用户setting(自定义指定目录) 和能自行设置本地仓库的位置，默认为.m2
+
+
+    maven的目录结构
+
+        .settings 工具生成的文件
+
+        target  编译生成的文件，项目编译后的class文件就会在这里
+
+        src 源代码
+            src/main/java   项目的java源码
+            src/main/sources 配置文件
+            src/main/test/java 测试的源码
+            src/main/test/sources 测试的配置文件
+
+        pom.xml 项目可信配置文件
+
+    常用命令
+        compile     src/main/java的文件编译在target中
+
+        test    测试命令，将java 和test的文件都编译在target中
+
+        clean 清理命令， 清理target的编译文件
+
+        package     打包命令，将java工程打包成jar包，将web工程打包成war包
+
+        install     安装命令，package命令执行的包安装在本地仓库中
+
+        后面的执行，都会执行前面的命令
+
+
+    maven三套独立生命周期
+
+        Clean Lifecycle 真正构建之前进行清理的工作
+
+        Default Lifecycle  核心部分，将工程，编译，测试，打包，部署等等
+
+        Site Lifecycle  生成项目报告\站点，发布站点
+
+
+    pom.xml的导包的定义
+        <dependencise>
+            <dependency>
+                <groupId></groupId> // 项目名称,定义为 组织名+项目名，类似包的名称
+                <artifactId></artifactId> // 模块的名称
+                <version></versoin> // 当前的版本号 snapshot 非正式版本，release正式发布版本
+                <packaging></packaging> // 打包的类型
+                <scope><scope> 作用范围
+            </dependency>
+        </dependencise>
+
+
+    <scope> 包的作用范围
+    complie: 编译范围，默认依赖范范围，就是编译，测试，运行的时候都是依赖当前这个包
+        如:spring-core
+    test: 测试范围，只有在测试的时候才依赖这个包
+        如:junit
+    provided: 依赖范围 只有在编译，还有测试的时候依赖这个包，运行不依赖这个包
+        如:servlet
+    runtime:  只有在测试和运行的时候才依赖这个包
+        如:jdbc的驱动
+    system: 只有在编译和测试的时候依赖这个包
+        本地的，除了maven仓库之外的类库
