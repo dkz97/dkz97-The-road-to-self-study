@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>黑马旅游-搜索</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" href="css/search.css">
+    <script src="js/jquery-3.3.1.js"></script>
+    <script src="js/getParameter.js"></script>
+
+
+    <script>
+
+        $(function () {
+            // // 获取cid，就是获取分类的名称
+            // var search = location.search;
+            // // search 就是 ?cid=xx 然后就可以使用字符串的切割来获取id了
+            // var cid = search.split("=")[1];
+            // // 再次获取rname的值，接收到的是地址值，需要先解码
+            // var rname = search.split("=")[2];
+            //
+
+            var cid = getParameter("cid");
+            if ("undefined" === cid) {
+                cid = null;
+            }
+            var rname = getParameter("rname");
+            // 引入script来获取路径名称
+            if (rname != null) {
+                // 将Uri路径解码变成中文
+                rname = window.decodeURIComponent(rname);
+            }
+
+            query(cid,null,rname);
+
+        });
+
+        function query(cid,currentPage,rname){
+            /**
+             * 给浏览器进行ajax传输，发送cid和当前页码
+             * 分出一个方法出来，让点击页码都可以进行ajax，在页码设置点击的事件，让其可以调用方法
+             */
+            $.get("/route/pageQuery",{"cid":cid,"currentPage":currentPage,"rname":rname},function (data) {
+
+                // 分页工具条的数据展示
+                $("#totalPage").html(data.totalPage);
+                $("#totalCount").html(data.totalCount);
+
+                /*
+                 * 展示分页的页码
+                 */
+
+                var lis = "";
+
+                // 首页
+                // 要使用异步的请求，所以需要调用方法
+                var firstPage = '<li><a href="javascript:void(0)" onclick="javescript:query('+cid + ','+ 1 +',\''+ rname + '\')">首页</a></li>';
+
+                // 上一页的代码
+                // 先计算一下上一页的代码，如果上一页为0的话，则变成1
+                var befornum = data.currentPage - 1;
+                if (befornum <= 0) {
+                    befornum = 1;
+                }
+                var upPage = '<li class="threeword"><a href="javascript:void(0)" onclick="query('+cid + ','+befornum +',\''+ rname +'\')">上一页</a></li>';
+
+                lis += firstPage;
+                lis += upPage;
+
+
+                /**
+                 * 定义页码， 只展示10个页码，
+                 *  设置开始页码start 和尾部页码end
+                 * 首先： 1.如果总页码不够10条，那尾部页码就直接用总页码就好
+                 *       2.如果总页码超过10条，则尾部页码用10，
+                 *          2.1 当前页码主要为中间位置，开始为当前页码的-5，结束为当前页码+4
+                 *              2.1.1 如果当前页码-5 少于1，则就是当前页码不大于5，则直接让当前页码=1，然后结尾页码后面补齐10个，就是+9就好了
+                 *              2.1.2 如果结尾页码大于总页码，则结尾为总页码，头部页码为 尾部页码 -9
+                 */
+                //定义开头页码和结束页码的的变量
+                var startPage = 0;
+                var endPage = 0;
+
+                if (data.totalPage < 10) {
+                    // 总页码少于10
+                    startPage = 1;
+                    endPage = data.totalPage;
+                }
+                else {
+                    // 总页码大于10
+                    startPage = data.currentPage - 4;
+                    endPage = data.currentPage + 5;
+
+                    if (startPage < 1) {
+                        // 意思就是减去5之后，开始的页码少于1，就是当前页码少于5，则让开始页码变成1，后面的页码补齐
+                        startPage = 1;
+                        endPage = startPage + 9;
+                    }
+
+                    if (endPage > data.totalPage) {
+                        // 意思就是最大的页码 +4后大于最大页码，则让尾部页码 = 总页码，并且让前面的页码补齐10个
+                        endPage = data.totalPage;
+                        startPage = endPage - 9;
+                    }
+                }
+
+                for (var i = startPage; i <= endPage; i++) {
+                    var html = "";
+                    if (data.currentPage == i) {
+                        // 判断如果是当前页码就加上样式
+                        html = '<li class="curPage" ><a   href="javascript:void(0)"  onclick="query('+cid + ','+i +',\''+ rname +'\')" >'+ i +'</a></li>';
+                    } else {
+                        html = '<li><a href="javascript:void(0)" onclick="query('+cid + ','+i +',\''+ rname +'\')" >' + i + '</a></li>';
+                    }
+                    lis += html;
+                }
+
+
+                // 下一页 和末页的代码
+                // 计算下一页的代码
+                var afternum = data.currentPage + 1;
+                if (afternum > data.totalPage) {
+                    afternum = data.totalPage;
+                }
+                lis += '<li class="threeword"><a href="javascript:void(0);" onclick="query('+cid + ','+afternum +',\''+ rname +'\')">下一页</a></li>';
+                lis += '<li class="threeword"><a href="javascript:void(0);" onclick="query('+cid + ','+data.totalPage +',\''+ rname +'\')">末页</a></li>';
+                $("#pageul").html(lis);
+
+
+                /**
+                 * 列表数据的展示
+                 * 给各种字符串加
+                 */
+
+                var routes = "";
+                for (var i =0;i < data.list.length;i++) {
+
+                    // 获取单一的列表
+                    var route = data.list[i];
+
+                    var html = '<li>\n' +
+                        '                 <div class="img"><img src="' + route.rimage +'" style="width: 299px;"></div>\n' +
+                        '                 <div class="text1">\n' +
+                        '                 <p>' + route.rname+'</p>\n' +
+                        '                 <br/>\n' +
+                        '                 <p>' + route.routeIntroduce+'</p>\n' +
+                        '                 </div>\n' +
+                        '                 <div class="price">\n' +
+                        '                 <p class="price_num">\n' +
+                        '                 <span>&yen;</span>\n' +
+                        '                 <span>'+ route.price +'</span>\n' +
+                        '                 <span>起</span>\n' +
+                        '                 </p>\n' +
+                        '                 <p><a href="route_detail.html?rid='+ route.rid + '">查看详情</a></p>\n' +
+                        '                 </div>\n' +
+                        '                 </li>';
+
+                    routes += html;
+                }
+                $("#info").html(routes);
+
+
+                // 可以点击页面之后就跳转到窗口的顶部
+                window.scrollTo(0,0);
+
+
+            });
+        }
+
+
+
+    </script>
+</head>
+<body>
+<!--引入头部-->
+<div id="header"></div>
+    <div class="page_one">
+        <div class="contant">
+            <div class="crumbs">
+                <img src="images/search.png" alt="">
+                <p>黑马旅行><span>搜索结果</span></p>
+            </div>
+            <div class="xinxi clearfix">
+                <div class="left">
+                    <div class="header">
+                        <span>商品信息</span>
+                        <span class="jg">价格</span>
+                    </div>
+                    <ul id="info">
+
+                    </ul>
+                    <div class="page_num_inf">
+                        <i></i> 共
+                        <span id="totalPage"></span>页<span id="totalCount"></span>条
+                    </div>
+                    <div class="pageNum">
+                        <ul id="pageul">
+                            <li><a href="">首页</a></li>
+                            <li class="threeword" id="upPage"><a href="#">上一页</a></li>
+                            <li><a href="#" id="page">1</a></li>
+                            <li class="threeword"><a href="javascript:;">下一页</a></li>
+                            <li class="threeword"><a href="javascript:;">末页</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="top">
+                        <div class="hot">HOT</div>
+                        <span>热门推荐</span>
+                    </div>
+                    <ul>
+                        <li>
+                            <div class="left"><img src="images/04-search_09.jpg" alt=""></div>
+                            <div class="right">
+                                <p>清远新银盏温泉度假村酒店/自由行套...</p>
+                                <p>网付价<span>&yen;<span>899</span>起</span>
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="left"><img src="images/04-search_09.jpg" alt=""></div>
+                            <div class="right">
+                                <p>清远新银盏温泉度假村酒店/自由行套...</p>
+                                <p>网付价<span>&yen;<span>899</span>起</span>
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="left"><img src="images/04-search_09.jpg" alt=""></div>
+                            <div class="right">
+                                <p>清远新银盏温泉度假村酒店/自由行套...</p>
+                                <p>网付价<span>&yen;<span>899</span>起</span>
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="left"><img src="images/04-search_09.jpg" alt=""></div>
+                            <div class="right">
+                                <p>清远新银盏温泉度假村酒店/自由行套...</p>
+                                <p>网付价<span>&yen;<span>899</span>起</span>
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="left"><img src="images/04-search_09.jpg" alt=""></div>
+                            <div class="right">
+                                <p>清远新银盏温泉度假村酒店/自由行套...</p>
+                                <p>网付价<span>&yen;<span>899</span>起</span>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--引入头部-->
+    <div id="footer"></div>
+    <!--导入布局js，共享header和footer-->
+    <script type="text/javascript" src="js/include.js"></script>
+</body>
+
+</html>

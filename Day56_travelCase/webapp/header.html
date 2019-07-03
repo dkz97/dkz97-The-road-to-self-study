@@ -1,0 +1,100 @@
+<script>
+    // 页面加载完成之后使用ajax，来获取当前用户的信息
+    $(function () {
+
+
+        // 获取cid
+        var search = location.search;
+        var cid = search.split("=")[1];
+
+        /**
+         * 用于信息展示的ajax
+         */
+        $.get("/user/findUser",function (data) {
+            // 返回的信息应该是这样{uid:1,name:"李四"...}
+            if (data.name != null) {
+                var msg = "欢迎回来 " + data.name;
+                $("#span_username").html(msg);
+            }
+        });
+
+        /**
+         * 种类分类展示的ajax，传入种类名称，页面展示
+         */
+        $.get("/category/findAll",function (data) {
+
+            var html = "<li class='nav-active' ><a href='index.html'>" +"首页"+"</a></li>";
+            for (var key in data) {
+                var li = "<li><a href='route_list.html?cid=" + data[key].cid+ "'>" + data[key].cname + "</a></li>";
+                html += li;
+            }
+            html += "<li><a href='favoriterank.html'>"+"收藏排行榜"+"</a></li>";
+            $("#category").html(html);
+        });
+
+        /**
+         * 给搜索按钮绑定单击事件，获取搜索的值
+         * 获取到搜索单击事件的值之后就可以拼接到数据框中然后跳转到route_list
+         *
+         */
+        $("#search-button").click(function () {
+
+            var rname = $("#rname").val();
+
+            // 跳转要绝对路径
+            location.href = "http://localhost:8080/route_list.html?cid=" + cid + "&rname=" + rname;
+        });
+    });
+
+</script>
+
+
+<!-- 头部 start -->
+    <header id="header">
+        <div class="top_banner">
+            <img src="images/top_banner.jpg" alt="">
+        </div>
+        <div class="shortcut">
+            <!-- 未登录状态  -->
+            <div class="login_out">
+                <a href="login.html">登录</a>
+                <a href="register.html">注册</a>
+            </div>
+            <!-- 登录状态  -->
+            <div class="login">
+            	
+                <span id="span_username" ></span>
+                <a href="myfavorite.html" class="collection">我的收藏</a>
+                <a href="javascript:location.href='/user/exit';">退出</a>
+            </div>
+        </div>
+        <div class="header_wrap">
+            <div class="topbar">
+                <div class="logo">
+                    <a href="/"><img src="images/logo.jpg" alt=""></a>
+                </div>
+                <div class="search">
+                    <input name="" type="text" id="rname" placeholder="请输入路线名称" class="search_input" autocomplete="off">
+                    <a href="javascript:;"  id="search-button" class="search-button">搜索</a>
+                </div>
+                <div class="hottel">
+                    <div class="hot_pic">
+                        <img src="images/hot_tel.jpg" alt="">
+                    </div>
+                    <div class="hot_tel">
+                        <p class="hot_time">客服热线(9:00-6:00)</p>
+                        <p class="hot_num">400-618-9090</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- 头部 end -->
+     <!-- 首页导航 -->
+    <div class="navitem">
+        <ul class="nav" id="category">
+
+
+        </ul>
+    </div>
+    

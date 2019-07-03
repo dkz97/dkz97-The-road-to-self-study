@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>注册</title>
+        <link rel="stylesheet" type="text/css" href="css/common.css">
+        <link rel="stylesheet" href="css/register.css">
+		<!--导入jquery-->
+		<script src="js/jquery-3.3.1.js"></script>
+
+
+		<style>
+
+
+		</style>
+
+
+		<script>
+
+			/*
+			* script进行表单校验(用正则来校验)
+			* 	1.用户名:8到20位的字母数字
+			* 	2.密码:8到20位的字母数字
+			* 	3.邮箱:
+			* 	4.姓名:非空
+			* 	5.手机号
+			* 	6.出生日期:非空
+			*
+			* 	主要是失去焦点以及表单提交的时候进行校验
+			* 	设置多个函数，来进行校验，然后设置失去焦点事件和表单提交来进行校验
+			* */
+
+			// 用户名的校验
+			function checkUsername() {
+				// 1.获取用户名的值
+				var username = $("#username").val();
+				// 2.定义正则表达式
+				var reg_username = /^\w{8,20}$/;
+				// 3.进行判断返回值, 使用test()方法来进行正则校验
+				var flag = reg_username.test(username);
+				// 判断用户名是非法还是合法
+				if (flag) {
+					// 用户名合法,合法就去除边框
+					$("#username").css("border","");
+				} else {
+					// 用户名非法就加上边框
+					$("#username").css("border","1px solid red")
+				}
+				return flag;
+			}
+
+			// 密码的校验
+			function checkPassword() {
+				// 1.获取密码的值
+				var password = $("#password").val();
+				// 2.定义正则表达式
+				var reg_password = /^\w{8,20}$/;
+				// 3.进行判断，返回flag
+				var flag = reg_password.test(password);
+				if (flag) {
+					$("#password").css("border","");
+				}else {
+					$("#password").css("border","1px solid red")
+				}
+				return flag;
+			}
+
+			// 邮箱的校验
+			function checkEmail() {
+				//和上面一样
+				var email = $("#email").val();
+
+				var reg_email = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/;
+
+				var flag = reg_email.test(email);
+
+				if (flag) {
+					$("#email").css("border","");
+				} else {
+					$("#email").css("border","1px solid red");
+				}
+				return flag;
+			}
+
+			// 姓名的校验
+			function checkName() {
+				//1.获取姓名的值，判断为非空就行
+				var name = $("#name").val();
+
+				var reg_name = /^[\s\S]*.*[^\s][\s\S]*$/;
+				var flag = reg_name.test(name);
+				if (flag) {
+					$("#name").css("border","");
+				} else {
+					$("#name").css("border","1px solid red");
+				}
+				return flag;
+			}
+
+			//手机号的校验
+			function checkPhone() {
+				var phone = $("#telephone").val();
+
+				var reg_phone = /0?(13|14|15|17|18|19)[0-9]{9}/;
+
+				var flag = reg_phone.test(phone);
+
+				if (flag) {
+					$("#telephone").css("border","");
+				} else {
+					$("#telephone").css("border","1px solid red")
+				}
+				return flag;
+			}
+
+			//出生日期的校验
+			function checkBirthday() {
+				var birthday = $("#birthday").val();
+
+				var reg_birthday = /^[\s\S]*.*[^\s][\s\S]*$/;
+
+				var flag = reg_birthday.test(birthday);
+
+				if (flag) {
+					$("#birthday").css("border","");
+				} else {
+					$("#birthday").css("border","1px solid red")
+				}
+
+				return flag
+			}
+
+
+			// 进行事件的绑定，先调用个入口函数
+			$(function () {
+				/*
+				* 1.先绑定表单提交的事件，提交后进行整体的表单校验，如果submit中的function返回值为false的时候，表单不会提交
+				* 2. 然后就是各个框的鼠标焦点离开就进行校验
+				*
+				* 	对于表单的提交:
+				* 	如果return false，那么表单就不会提交，然后就可以进行校验判断，判断成功后就进行ajax的提交
+				* */
+
+				// 绑定表单提交事件
+				$("#registerForm").submit(function () {
+
+					// 判断校验通过后，就使用ajax进行表单的提交，回调函数接收json数据
+					// jquery 中有一个方法 serialize()，可以使用jquery表单对象来调用，会返回key=value&key=value这个格式的字符串，就好比如username=zhangsan&password=xxx...
+					// 整个思路就是提交事件中阻止表单提交，然后使用ajax来进行数据的提交
+					if (checkBirthday() && checkEmail() && checkName() && checkPassword() && checkPhone() && checkUsername()) {
+						$.post("/user/register",$(this).serialize(),function (data) {
+							// data :{"flag":,"data":,"errorMsg":""}
+							if (data.flag) {
+								location.href = "register_ok.html";
+							} else {
+								$("#erroMsg").html(data.errorMsg);
+							}
+
+						});
+					}
+					return false
+
+				});
+
+
+				// 绑定输入框的焦点离开事件检验，并且在框框后面给予一定的提示信息
+				// 设置用户名称框的事件
+
+				$("#username").blur(checkUsername);
+				$("#password").blur(checkPassword);
+				$("#email").blur(checkEmail);
+				$("#telephone").blur(checkPhone);
+				$("#name").blur(checkName);
+				$("#birthday").blur(checkBirthday);
+
+
+
+			});
+
+
+		</script>
+    </head>
+	<body>
+	<!--引入头部-->
+	<div id="header"></div>
+        <!-- 头部 end -->
+    	<div class="rg_layout">
+    		<div class="rg_form clearfix">
+    			<div class="rg_form_left">
+    				<p>新用户注册</p>
+    				<p>USER REGISTER</p>
+    			</div>
+    			<div class="rg_form_center">
+					<div id="erroMsg" style="color:red; text-align:center; padding-top: 10px"></div>
+					<!--注册表单-->
+    				<form id="registerForm" action="/register.html" method="post">
+						<!--提交处理请求的标识符-->
+						<input type="hidden" name="action" value="register">
+    					<table style="margin-top: 25px;">
+    						<tr>
+    							<td class="td_left">
+    								<label for="username">用户名</label>
+    							</td>
+    							<td class="td_right">
+    								<input type="text" id="username" name="username" placeholder="请输入账号">
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left">
+    								<label for="password">密码</label>
+    							</td>
+    							<td class="td_right">
+    								<input type="text" id="password" name="password" placeholder="请输入密码">
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left">
+    								<label for="email">Email</label>
+    							</td>
+    							<td class="td_right">
+    								<input type="text" id="email" name="email" placeholder="请输入Email">
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left">
+    								<label for="name">姓名</label>
+    							</td>
+    							<td class="td_right">
+    								<input type="text" id="name" name="name" placeholder="请输入真实姓名">
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left">
+    								<label for="telephone">手机号</label>
+    							</td>
+    							<td class="td_right">
+    								<input type="text" id="telephone" name="telephone" placeholder="请输入您的手机号">
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left">
+    								<label for="sex">性别</label>
+    							</td>
+    							<td class="td_right gender">
+    								<input type="radio" id="sex" name="sex" value="男" checked> 男
+    								<input type="radio" name="sex" value="女"> 女
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left">
+    								<label for="birthday">出生日期</label>
+    							</td>
+    							<td class="td_right">
+    								<input type="date" id="birthday" name="birthday" placeholder="年/月/日">
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left">
+    								<label for="check">验证码</label>
+    							</td>
+    							<td class="td_right check">
+    								<input type="text" id="check" name="check" class="check">
+    								<img src="checkCode" height="32px" alt="" onclick="changeCheckCode(this)">
+									<script type="text/javascript">
+										//图片点击事件
+										function changeCheckCode(img) {
+											img.src="checkCode?"+new Date().getTime();
+                                        }
+									</script>
+    							</td>
+    						</tr>
+    						<tr>
+    							<td class="td_left"> 
+    							</td>
+    							<td class="td_right check"> 
+    								<input type="submit" class="submit" value="注册">
+									<span id="msg" style="color: red;"></span>
+    							</td>
+    						</tr>
+    					</table>
+    				</form>
+    			</div>
+    			<div class="rg_form_right">
+    				<p>
+    					已有账号？
+    					<a href="#">立即登录</a>
+    				</p>
+    			</div>
+    		</div>
+    	</div>
+        <!--引入尾部-->
+    	<div id="footer"></div>
+		<!--导入布局js，共享header和footer-->
+		<script type="text/javascript" src="js/include.js"></script>
+    	
+    </body>
+</html>
