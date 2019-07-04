@@ -1,0 +1,123 @@
+1.Mybatis
+    1.入门
+    2.概述
+    3.环境搭建
+    4.入门案例
+    5.自定义mybatis
+
+
+
+
+
+一.入门
+    1.框架的概念:
+        框架就是开发过程中的一套解决方案，一个半成品，不同的框架解决不同的问题
+            框架可以封装很多细节，提高开发效率
+
+    2.三层架构
+        表现层:
+            用于展示数据
+        业务层:
+            用于处理业务需求
+        持久层:
+            用于与数据库的交互
+
+        mybatis，是用于持久层的框架
+
+
+    3.之前持久层的解决方案:
+
+        1.Jdbc技术:
+            Connection: 获取连接的对象
+            PrepareStatement: 用于操作sql的对象
+            ResultSet:  获取的结果的集合对象
+
+        2.Spring的JdbcTemplate:
+            是Spring对jdbc的简单封装
+
+        3.Apache的DBUtils:
+            和JdbcTemplate类似，也是对于jdbc技术的封装
+
+        但是上述的都不是框架，jdbc是对数据库操作的一个规范，而其他两个相当于一个工具类，
+
+
+
+二.Mybatis的概述
+
+    Mybatis是一个持久层框架，用java编写
+    封装许多jdbc操作的细节，让用户只关注于sql本身，而无需关注连接的时候注册驱动，创建连接等繁杂的过程
+    使用了ORM的思想实现结果集的封装
+
+    ORM:
+        Object Relational Mapper : 对象关系映射
+
+            简单来说: 就是把数据库中表 与 实体类和实体类的属性对应起来
+                     然后达到操作实体类就可以操作数据库表
+
+            实体类的属性和数据库表的字段名称要一样
+                实体类属性           数据库表字段名称
+                user                user
+                id                  id
+                user_name           user_name
+
+
+
+三.环境搭建:
+
+    pom.xml主要配置环境:
+        1.首先在pom.xml中配置mybatis， 可以直接从官网中使用配置属性
+        2.由于是与数据库的操作，所以也要配置数据库的属性
+
+    创建了Dao和封装所用的类(和数据库表一一对应的类)之后，就可以在resources中配置反射文件
+
+        创建和Dao一样的包路径，在里面创建xxx.xml，然后配置，这个反射环境的话只有xml配置才使用，注解就不使用了
+
+        前面的为头文件
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+        设置反射环境，让mybatis可以找到这个方法的sql
+        <mapper namespace="">       namespace: 需要反射的dao的全类名
+            <select id="" resultType="" >   id: 需要调用的方法名称   resultType: 需要封装的类的全类名
+                sql语句
+            </select>
+        </mapper>
+
+
+    然后再去resources 中配置sqlMapConfig的配置文件，使用模版配置，主要是配置mybatis的环境和连接数据库的环境
+
+
+
+    mybatis的环境搭建
+    		第一步：创建maven工程并导入坐标
+    		第二步：创建实体类和dao的接口
+    		第三步：创建Mybatis的主配置文件
+    				SqlMapConifg.xml
+    		第四步：创建映射配置文件
+    				IUserDao.xml
+
+    环境搭建的注意事项：
+    		第一个：创建UserDao.xml 和 UserDao.java时名称是为了和我们之前的知识保持一致。
+    			在Mybatis中它把持久层的操作接口名称和映射文件也叫做：Mapper
+    			所以：UserDao 和 UserMapper是一样的
+    		第二个：在idea中创建目录的时候，它和包是不一样的
+    			包在创建时：dkz97.dao它是三级结构
+    			resources下面的目录在创建时：dkz97.dao是一级目录
+    		第三个：mybatis的映射配置文件位置必须和dao接口的包结构相同,
+    		第四个：映射配置文件的mapper标签namespace属性的取值必须是dao接口的全限定类名
+    		第五个：映射配置文件的操作配置（select），id属性的取值必须是dao接口的方法名
+
+    		当我们遵从了第三，四，五点之后，我们在开发中就无须再写dao的实现类。
+
+
+    注解的配置:
+            1.使用注解的话，直接在dao的方法上加上注解
+                @Select("sql语句")
+
+            2.修改sqlMapConfig的映射位置配置
+                <mappers>
+                    <mapper class=" Dao类的全类名 "/> 注意如果是用注解配置的话，就需要用class
+                </mappers>

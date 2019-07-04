@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置反射环境，让mybatis可以找到这个方法的sql -->
+<!-- namespace就是userDao的全类名 -->
+<mapper namespace="dkz97.dao.UserDao">
+    <!-- 配置UserDao中findAll 方法的sql -->
+    <!-- 中间设置的是sql语句，id为调用该语句的方法名称， resultType为结果出来后封装的类-->
+    <select id="findAll" resultType="dkz97.domain.User" >
+        SELECT * FROM user
+    </select>
+</mapper>
