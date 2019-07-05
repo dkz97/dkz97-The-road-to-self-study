@@ -1,0 +1,12 @@
+1.自定义mybatis
+
+
+
+
+一.入门案例mybatis能看到的类
+
+    class Resources: 自定义就是一个传入路径的方法，根据类加载器找到当前路径的配置文件返回字节输入流
+
+    class SqlSessionFactoryBuilder
+    interface SqlSessionFactory
+    interface SqlSession

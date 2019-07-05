@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+    <!-- 配置 mybatis 的环境 -->
+    <environments default="mysql">
+        <!-- 配置 mysql 的环境 -->
+        <environment id="mysql">
+            <!-- 配置事务的类型 -->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 配置连接数据库的信息：用的是数据源(连接池) -->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/day57"/>
+                <property name="username" value="root"/>
+                <property name="password" value="pzr980716"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!-- 指定映射文件的配置，指定映射文件配置的全类名 -->
+    <mappers>
+        <mapper resource="dkz97/dao/UserDao.xml"/>
+    </mappers>
+
+    <!-- 注解配置的映射 -->
+<!--    <mappers>-->
+<!--        <mapper class="dkz97.dao.UserDao"/>-->
+<!--    </mappers>-->
+</configuration>
