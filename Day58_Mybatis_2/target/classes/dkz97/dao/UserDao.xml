@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 配置反射的Dao类的全类名 -->
+<mapper namespace="dkz97.dao.UserDao">
+
+
+    <select id="findAll" resultType="dkz97.domain.User"> <!-- id就是方法名  resultType 就是结果的返回类型 -->
+        SELECT * FROM user;
+    </select>
+
+    <!-- 根据id查询用户 parameterType 就是传入参数的类型  占位符就是${xxx} 里面的参数就根据参数类型来传入-->
+    <select id="findById" resultType="dkz97.domain.User" parameterType="int">
+        SELECT * FROM User WHERE id=#{uid};
+    </select>
+
+
+    <!-- 保存用户 -->
+    <insert id="saveUser" parameterType="dkz97.domain.User">
+        <!-- 可以获取保存之后的id属性 keyproperty为实体类的属性名  keycolumn是数据库表类的列名 -->
+        <selectKey keyColumn="id" keyProperty="id" resultType="int">
+            select last_insert_id();
+        </selectKey>
+        INSERT INTO user(username,birthday,sex,address) values(#{username},#{birthday},#{sex},#{address});
+    </insert>
+
+
+    <!-- 添加修改的方法 -->
+    <update id="updateUser" parameterType="dkz97.dao.UserDao" >
+        UPDATE user set username=#{username},address=#{address},sex=#{sex} WHERE id=#{id};
+    </update>
+
+
+    <!-- 添加根据id删除用户方法 -->
+    <delete id="deleteUser" parameterType="int">
+        DELETE FROM user WHERE id=#{uid};
+    </delete>
+
+    
+    <!-- 建立模糊查询 -->
+    <select id="findByName" resultType="dkz97.domain.User" parameterType="String">
+         SELECT * FROM user WHERE username LIKE #{username};
+         <!-- SELECT * FROM user WHERE username LIKE '%${value}%' 这个是相当于拼接字符串-->
+
+    </select>
+
+
+    <!-- 查询总记录条数 -->
+    <select id="findTotal" resultType="int">
+        select count(*) from user;
+    </select>
+</mapper>

@@ -1,0 +1,168 @@
+1.环境搭建回顾
+2.Mybatis的crud
+3.Mybatis的参数深入以及结果几的深入
+4.Mybatis基于传统dao实现类的方式(并且了解源码走势)
+5.Mybatis的配置(SqlMapConfig.xml)
+    properties 标签
+    typeAliases 起别名标签
+    mappers 标签
+
+
+
+
+
+一.环境搭建回顾
+
+    创建dao的类
+
+    SqlMapConfig.xml 主配置
+
+    dao对象.xml 映射配置
+
+
+二.使用Mybatis的crud
+
+    主要还是在
+    dao.xml 中进行配置环境和配置sql语句
+
+    主要标签是
+       查        增        删      修改
+    <select>  <insert> <delete> <update>
+
+    配置解释：
+        <select id="findById" resultType="dkz97.domain.User" parameterType="int">
+                SELECT * FROM User WHERE id=#{uid};
+        </select>
+
+        id: 方法的名称
+        resultType: 封装的结果集的类型
+        parameter: 参数的传入类型
+        #{xxx}: #{} 相当于一个占位符，然后里面的参数就由传入的参数决定，
+
+
+    <!-- 保存用户 -->
+        <insert id="saveUser" parameterType="dkz97.domain.User">
+            INSERT INTO user(username,birthday,sex,address) values(#{username},#{birthday},#{sex},#{address});
+        </insert>
+
+        注意: 传入的是一个对象，然后就可以直接使用对象中的属性名称去传值就行了！！
+
+        #{}中内容的写法：
+            由于我们保存方法的参数是 一个 User 对象，此处要写 User 对象中的属性名称。
+            它用的是 ognl 表达式。
+
+        ognl 表达式：
+            它是 apache 提供的一种表达式语言，全称是：
+                Object Graphic Navigation Language 对象图导航语言
+                它是按照一定的语法格式来获取数据的。
+                语法格式就是使用 #{对象.对象}的方式
+
+        到最后一定要在类中提交事务： session.commit()
+
+
+        扩展：新增用户 id 的返回值
+            新增用户后，同时还要返回当前新增用户的 id 值，因为 id 是由数据库的自动增长来实现的，所以就相
+            当于我们要在新增后将自动增长 auto_increment 的值返回，添加到类中。
+
+        <selectKey keyColumn="id" keyProperty="id" resultType="int">
+            select last_insert_id();
+        </selectKey>
+
+
+        对于模糊查询,两个办法
+            1. sql语句中使用 #{}占位符，然后在传递参数的时候加入 %xxx% 加上百分号
+
+            2.在sql语句中设置 '%${value}%' 然后传入参数的时候直接传入字符就好了，里面必须是value
+
+
+    #{}和${}的区别
+
+    #{}表示一个占位符号
+        通过#{}可以实现 preparedStatement 向占位符中设置值，自动进行 java 类型和 jdbc 类型转换，
+        #{}可以有效防止 sql 注入。 #{}可以接收简单类型值或 pojo 属性值。 如果 parameterType 传输单个简单类型值，#{}括号中可以是 value 或其它名称。
+
+    ${}表示拼接 sql 串
+        通过${}可以将 parameterType 传入的内容拼接在 sql 中且不进行 jdbc 类型转换， ${}可以接收简
+        单类型值或 pojo 属性值，如果 parameterType 传输单个简单类型值，${}括号中只能是 value。
+
+
+
+三.参数的深入
+    parameterType:  配置参数
+        这个是给sql传入参数的对象
+
+        基本类型和String的类型可以直接写类型名称，也可以加上包名.类名
+        但是实体类的类型就必须加上包名.类名
+
+        原因的话就是，基本类型在mybatis加载的时候，已经注册了别名，自己创建的实体类还没有注册别名，所以就需要自己加上包名
+
+
+    resultType: 配置结果
+        这个属性是可以指定结果封装后的对象，支持基本类型和实体类类型
+
+        如果注册过别名就可以直接用别名，如果是用实例类的话还是要把包全部导入，然后实体类要注意里面的属性要和数据库的表的列名保持一致
+
+
+    注意:
+        如果实体类的名称和查询数据库表的列名不一样的话，有以下两个办法
+
+        1.在sql语句中使用别名
+            就是前面是数据库表的名称，as后面对应实体类的，相当于把数据库表的列名起别名
+        select id as uid,username as userName....from user;
+
+        2.使用resultMap标签
+
+
+            <resultMap type=""  id="">   type:实体类的全类名  id:给定唯一标示，select引用的
+                <id column="" property="">
+                <result column="" property="">
+                <result column="" property="">
+                    id标签: 表示主键的
+                    result: 表示非主键的
+                    column: 列名
+                    property: 实例类属性名
+            </resultMap>
+
+
+            想要使用的时候  <select id="xxx" resultMap="map指定的id" >  sql语句</select>
+
+
+
+四.使用dao实现类实现sql
+
+    如果要使用dao实现类实现sql的话，就需要在实现类中获取SqlSession对象
+        使用方法
+        List<E> session.selectList("传入dao全类名.方法名", 参数列表) 这个是返回一个list
+        <E> session.selectOne(); 返回一个对象
+        int session.insert(); 返回影响行数，主要用来增加
+        int session.update();  返回影响行数
+        int session.delete;    返回影响行数
+
+
+
+五.sqlMapConfig里面的标签属性
+
+    properties: 可以使用两种方法配置属性
+        1.直接使用<properties> <property> 来配置文件
+
+        2.可以在外面配置一个properties文件 ，里面写好对应的Key 和value
+            然后在 <properties url=" 填入url路径，是全路径，file://xxxx "> </properties>
+
+
+    typeAliases: 类名别名
+        在 SqlMapConfig.xml 中配置：
+        <typeAliases>
+            <!-- 单个别名定义 -->
+            <typeAlias alias="user" type="com.itheima.domain.User"/>
+            <!-- 批量别名定义，扫描整个包下的类，别名为类名（首字母大写或小写都可以） -->
+            <package name="com.itheima.domain"/>
+            <package name="其它包"/>
+        </typeAliases>
+
+        然后下面需要用到这个包的全类名的都可以直接使用这个别名就好了
+
+
+    mappers: 映射类型
+        resource: 写的是指定的映射xml配置
+        class: 注解配置的时候使用，写的是dao的全类名
+        <package name="dao的全类名"> 制定了package指定dao接口所在的包，指定之后就不需要写mapper以及 resource和class了
