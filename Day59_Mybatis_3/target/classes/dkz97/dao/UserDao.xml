@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="dkz97.dao.UserDao">
+    <select id="findAll" resultType="dkz97.domain.User">
+        SELECT * FROM user
+    </select>
+
+
+
+    <!-- 动态的sql进行查询，当if为真的时候，自动拼接在sql语句后面，也可以加上where标签 -->
+    <select id="findByUser" resultType="dkz97.domain.User" parameterType="dkz97.domain.User">
+        SELECT * FROM user
+        <where>
+        <if test="username != null and username != ''" >
+            AND username=#{username}
+        </if>
+        <if test="address != null">
+             AND address=#{address}
+        </if>
+        </where>
+    </select>
+    
+    
+    <!-- 根据传入的列表，进行in的查询 -->
+    <select id="findByList" parameterType="ArrayList" resultType="dkz97.domain.User">
+        SELECT * FROM user
+        <where>
+            <if test="list!=null">
+                <foreach collection="list" open="AND id IN ( " close=" )" item="uid" separator=",">
+                    #{uid}
+                </foreach>
+            </if>
+
+        </where>
+    </select>
+</mapper>

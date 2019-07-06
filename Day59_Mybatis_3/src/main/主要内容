@@ -1,0 +1,167 @@
+1.Mybatis中的连接池以及事务控制
+    连接池使用以及分析
+    事务控制的分析
+
+2.Mybatis基于Xml配置的动态sql语句使用
+    mappers配置文件中的几个标签
+        <if>
+        <where>
+        <for each>
+        <sql>
+
+3.Mybatis中的夺标操作
+    一对多
+    多对一
+    一对一
+    多对多
+
+
+
+
+
+一.Mybatis中的连接池配置
+
+    标签: <dataSource type=" 连接池技术 " >
+
+    在mybatis中一共有三种技术
+        unpooled    不实用连接池的数据源
+        pooled      使用连接池的数据源
+        JNDI        使用 JNDI 实现的数据源
+
+    mybatis内部中分别定义了两个类  UnpooledDataSource 和PooledDataSource  分别代表UNPOOLED 和 POOLED 两个技术，都继承了DataSource
+
+    type=”POOLED”：MyBatis 会创建 PooledDataSource 实例
+    type=”UNPOOLED” ： MyBatis 会创建 UnpooledDataSource 实例
+    type=”JNDI”：MyBatis 会从 JNDI 服务上查找 DataSource 实例，然后返回使用，注意：如果不是web或者maven的war工程，是不能使用的。
+
+
+    创建connection对象的时间: 只有当创建SqlSession对象，并且执行sql语句的时候，这个时候Mybatis才会调用DataSource对象来创建connection对象
+
+
+    连接池的工作模式:
+        有空闲池和工作池，当需要用到连接的时候，先去空闲池看是否还有连接空闲，有的话直接使用，没的话就去看工作池。
+            去到工作池的时候，看当前连接池数量是否已经是最大连接数量，如果是的话，就remove掉最早进去连接池的连接，然后再根据一系列的封装
+                返回新的连接到连接池中，再次取出
+
+
+
+二.Mybatis的事务控制
+
+    Mybatis 中事务的提交方式，本质上就是调用 JDBC 的 setAutoCommit()来实现事务控制。
+
+
+    什么是事务
+    	事务的四大特性ACID
+    	    a: 原子性， 要么提交，要么回滚
+    	    c: 一致性   简单来说  转账的两个账户总数加起来都不变
+    	    i: 隔离性   我在执行这个事务的时候其他人不能动
+    	    d: 持久性   一旦被提交就持久保存
+
+    	不考虑隔离性会产生的3个问题
+    	    脏读:  你没提交的东西我还能看到
+    	    不可重复读:  我在查询只有1，2，3，但是我还没提交，你提交了4，我也能看到4
+    	    幻读: 和不可重复读差不多，但是针对的是整体的数据，不可重复读只是一个数据项
+
+    	解决办法：四种隔离级别
+            read_uncommitted 读未提交: 三个问题都有
+            read_committed  读提交: 一个事务要等另一个事务提交后才能读取数据 只有不可重复读和幻读的问题
+            repeatable_read  可重复读: 在开始读取数据（事务开启）时，不再允许修改操作。允许幻想读，不允许不可重复读和脏读
+            serializable 串行化: 事务串行化顺序执行，一条一条的执行
+
+    	mybatis是通过sqlsession对象的commit方法和rollback方法实现事务的提交和回滚
+
+
+
+三.Mybatis的动态sql查询
+
+    <if test=" ">  test: 里面的属性是一个判断语句，判断的是java传入的参数，所以如果是属性的话，使用的也是类的属性名称，要注意
+
+    <where>   </where>  相当于加一个where，里面包裹的是if 和for each, 当里面的条件成立的时候才加上where，主要用于简化where 1=1
+
+
+    <foreach> 标签，主要是解决   AND id IN (xxxx)  这个sql
+
+        <foreach collection="" open="" close="" item="" separator="">
+
+            collection: 需要遍历的对象
+            open: 最开始拼接的字符串      例: AND id IN (
+            close: 结束的时候拼接的字符串  例：)
+            item: 遍历的每一个元素的变量名  相当于i
+            separator:  每个元素之间的分割符号   例:  ","
+
+
+    Sql 中可将重复的 sql 提取出来，使用时用 include 引用即可，最终达到 sql 重用的目的。
+        <!-- 抽取重复的语句代码片段 -->
+        <sql id="defaultSql">
+            select * from user
+        </sql>
+
+    引用代码片段
+        <select id="findAll" resultType="user">
+            <include refid="defaultSql"></include>
+        </select>
+
+
+
+四.Mybatis的多表查询
+
+
+    一对一查询:
+
+        ！！从表实体应该包含主表实体
+
+        第一种方法: 创建一个新的实体类来接收 返回的新表
+
+              使用账户表中的uid和 用户表用的id，对应查询，然后创建一个新的对象，将一起查询到的数据封装到新实体类中
+
+        第二种方法: 在账户表中创建 用户实体类的属性，然后可以根据查询，将用户实体类封装到里面去
+
+            在xml中进行映射方法，可以设置 最开始封装的account类，还有封装在account类中的user属性类
+
+            使用 <resultMap> 标签 ，定义专门的 resultMap 用于映射一对一查询结果。
+
+
+
+            外面的一层 resultMap, 定义的就是封装结果的类，然后id就是下面调用的， type的就会封装的结果
+                    <resultMap id="accountResultMap" type="">
+                        <id property="" column=""></id>
+                        <result property="money" column="money"></result>
+
+                        association: 主要定义的是，主封装类里面的类属性, column为主要根据哪一列来进行判定也可以没有, javaType就是类的对象
+                        <association property="" column="uid" javaType="dkz97.domain.User">
+                            <id property="id" column="id"></id>
+                        </association>
+                    </resultMap>
+
+
+
+    一对多查询:  ！！ 主表实体应该包含从表实体的集合类
+
+            基本使用方法和多对一差不多，都是先弄个 <resultMap> 结果映射来搞给下面的东西
+
+            然后sql语句使用左外连接来获取, 可以获取所有用户，以及获取条件足够的右边的表，
+                左外连接就是左边的全部都查询，右边的只查询条件符合的  表1 left join  表2 on 条件
+
+
+            主要是内部的属性映射要修改，由于属性是List<Account> 是list的，所以标签需要使用<collection>
+
+            使用的是 ofType 来封装结果集
+            <collection property="accounts" ofType="dkz97.domain.Account">
+                        <id property="id" column="aid"></id>
+                        <result property="uid" column="uid"></result>
+            </collection>
+
+
+
+    多对多查询:
+
+        多对多查询的话，就需要 有个中间表查询才行，根绝两个对应的 key 来查询
+
+        1.数据库表中是需要三个表， 两个主表和一个中间表
+
+        2.在实体类中只需要两个主类就行了，由于是多对多的关系，所以主类1要包含主类2的结果集合，主类2也是一样
+
+        3.sql语句的话，使用两次左外链接，先用主表1和中间表进行一次，然后再根据得出来的结果，和主表2进行左外连接，然后就可以得到
+            主表1，并且包含主表2的信息
+
+            在实体类中也是一样，能获得实体类1，并且里面有实体类2的属性

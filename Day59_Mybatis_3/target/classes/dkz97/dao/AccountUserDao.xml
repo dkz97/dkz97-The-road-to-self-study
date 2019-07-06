@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+
+
+<!-- 定义1对多表查询的sql映射 -->
+<mapper namespace="dkz97.dao.AccountUserDao">
+    
+    <!-- 多对一的查询关系映射  定义封装的结果Account和 Account的属性User类的结果映射 -->
+    <resultMap id="accountResultMap" type="dkz97.domain.Account"> <!-- 第一个type为封装的对象类型 -->
+        <id property="id" column="aid"></id>
+        <result property="money" column="money"></result>
+        <result property="uid" column="uid"></result>
+        <!-- 定义主类里面的属性类对象的封装结果，property为属性名称 column为根据 什么元素进行查询 -->
+        <association property="user" column="uid" javaType="dkz97.domain.User">
+            <id property="id" column="id"></id>
+            <result property="username" column="username"></result>
+            <result property="address" column="address"></result>
+            <result property="sex" column="sex"></result>
+            <result property="birthday" column="birthday"></result>
+        </association>
+    </resultMap>
+    
+    <select id="findAll" resultMap="accountResultMap">
+        SELECT u.*,a.id as aid,a.money,a.uid FROM user as u,account as a WHERE a.uid = u.id;
+    </select>
+
+
+
+
+
+    <!-- 一对多的查询的关系映射配置 -->
+    <resultMap id="UserResultMap" type="dkz97.domain.User">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="address" column="address"></result>
+        <result property="sex" column="sex"></result>
+        <result property="birthday" column="birthday"></result>
+
+        <!-- 定义User类下面的list<Account>属性 -->
+        <collection property="accounts" ofType="dkz97.domain.Account">
+            <id property="id" column="aid"></id>
+            <result property="uid" column="uid"></result>
+            <result property="money" column="money"></result>
+        </collection>
+    </resultMap>
+
+    <select id="findAllUser" resultMap="UserResultMap">
+        SELECT u.*,a.id as aid,a.money FROM user as u left outer join account as a on u.id = a.uid
+    </select>
+
+</mapper>
