@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="dkz97.dao.AccountDao">
+
+    <resultMap id="findAllMap" type="dkz97.domain.Account">
+        <id property="id" column="aid"></id>
+        <result property="uid" column="uid"></result>
+        <result property="money" column="money"></result>
+
+        <!-- 使用延迟加载的机制,select 为延迟加载后的执行的全类名加上方法,然后column数据表中给延迟加载语句传入的数据的列名，
+            多数情况下为唯一判定别的表的外键-->
+        <association property="user" javaType="dkz97.domain.User" select="dkz97.dao.UserDao.findById" column="uid">
+        </association>
+    </resultMap>
+
+
+    <select id="findAll" resultMap="findAllMap">
+        SELECT * from account;
+    </select>
+
+
+    <select id="findByUid" resultType="dkz97.domain.Account" parameterType="dkz97.domain.User">
+        SELECT * from account where uid=#{uid}
+    </select>
+</mapper>

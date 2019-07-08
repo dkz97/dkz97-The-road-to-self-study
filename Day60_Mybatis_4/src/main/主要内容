@@ -1,0 +1,193 @@
+1.Mybatis中的延迟加载
+    延迟加载和立即加载的概念
+2.Mybatis中的缓存
+    一级缓存和耳机缓存的概念
+3.Mybatis中的注解开发
+
+
+
+
+
+
+
+
+
+
+一.Mybatis的延迟加载
+
+    延迟加载概念:
+        延迟加载就是当需要用到数据的时候才进行加载，不需要用到数据的时候就不加载，延迟加载也称为懒加载
+
+        好处: 先从单表查询，当需要其他数据的时候才从关联表进行查询，提升数据库性能
+
+        坏处: 如果在大量的数据进行查询的时候的话，单表查询也需要用时间，所以数据量大的话耗时会更长
+
+    例如: User表中有Account信息，但是有的时候只想要查询用户，不需要账户信息，所以延迟加载就可以设计成，查询账户信息为延迟加载，不需要账户信息就不查询
+
+    立即加载: 就是有的东西都立刻加载出来
+
+        一对多,多对多: 基本上都是延迟加载
+        多对一,一对一: 基本上都是立即加载
+
+    mybatis实现:
+
+        要在主配置文件中sqlMapConfig中配置
+             <!-- 配置延迟加载机制，第一个为延迟加载的开关开启-->
+                <settings>
+                    <setting name="lazyLoadingEnabled" value="true"/>
+                    <setting name="aggressiveLazyLoading" value="false"/>
+                </settings>
+
+
+             然后在需要缓存的语句那里，配置映射的两个表内属性
+             <association  select=""   column=""  property="" javaType="">
+                select:为延迟加载需要用到的sql语句的全类名方法,然后column，是当延迟加载的sql语句需要传入参数的时候，可以让当前表的列名传入数据，多数都是两个表之间的关联字段
+
+             <collection select="" column="" property="" ofType="" >
+
+        延迟加载主要就是
+            当前表会立即加载，关联表可以进行需求加载，主要
+                1.settings 标签中的设置
+                2. 延迟加载关联的sql语句的设置
+                3. 当前语句的标签设置select 和column两个属性
+
+
+
+二.Mybatis的缓存
+
+    mybatis中提供的缓存，可以减少数据库的查询次数。
+
+    一级缓存: 它指的是Mybatis中SqlSession对象的缓存。
+
+        当我们执行查询之后，查询的结果会同时存入到SqlSession为我们提供一块区域中。
+        该区域的结构是一个Map。当我们再次查询同样的数据，mybatis会先去sqlsession中
+        查询是否有，有的话直接拿出来用。
+        当SqlSession对象消失时，mybatis的一级缓存也就消失了。
+
+        注意:一级缓存是 SqlSession 范围的缓存，当调用 SqlSession 的修改，添加，删除，commit()，close()等方法时，就会清空一级缓存。
+
+
+    二级缓存: mapper映射级别的缓存，多个SqlSession去共同操作一个Mapper映射的语句，多个SqlSession可以共用一级缓存
+
+        第一步：让Mybatis框架支持二级缓存（在SqlMapConfig.xml中配置）
+        第二步：让当前的映射文件支持二级缓存（在IUserDao.xml中配置）
+        第三步：让当前的操作支持二级缓存（在select标签中配置）
+
+
+        sql配置:
+            <settings>
+            <!-- 开启二级缓存的支持 -->
+            <setting name="cacheEnabled" value="true"/>
+            </settings>
+        因为 cacheEnabled 的取值默认就为 true，所以这一步可以省略不配置。为 true 代表开启二级缓存；为
+        false 代表不开启二级缓存。
+
+
+        第二步：
+            <mapper namespace="com.itheima.dao.IUserDao">
+            <!-- 开启二级缓存的支持 -->
+                <cache></cache>
+            </mapper>
+
+        第三步:
+            <!-- 根据 id 查询 -->
+            <select id="findById" resultType="user" parameterType="int" useCache="true">
+                select * from user where id = #{uid}
+            </select>
+            将 UserDao.xml 映射文件中的<select>标签中设置 useCache=”true”代表当前这个 statement 要使用
+                二级缓存，如果不使用二级缓存可以设置为 false。
+
+            注意:
+
+            当我们在使用二级缓存时，所缓存的类一定要实现 java.io.Serializable 接口，这种就可以使用序列化
+        方式来保存对象。
+
+
+
+
+
+三.注解开发
+
+    @Insert:实现新增
+
+    @Update:实现更新
+
+    @Delete:实现删除
+
+    @Select:实现查询
+
+    @Result:实现结果集封装
+
+    @Results:可以与@Result 一起使用，封装多个结果集
+
+        @Results(id = "userMap",value = {
+                @Result(id=true, property = "userId", column = "id"),
+                @Result(property = "userName", column = "username")
+
+            })
+
+    @ResultMap:实现引用@Results 定义的封装
+
+         @ResultMap(value = {"userMap"})  value填入Results的id
+
+    @One:实现一对一结果集封装
+        多表查询，一对一，或者多对一的时候，主要是用在Result的属性 one = @One 中，然后有参数select 和fetchType,和延迟加载那个差不多
+
+    @Many:实现一对多结果集封装
+
+    @SelectProvider: 实现动态 SQL 映射
+
+    @CacheNamespace:实现注解二级缓存的使用
+
+
+
+
+
+    @Results 注解
+        代替的是标签<resultMap>
+        该注解中可以使用单个@Result 注解，也可以使用@Result 集合
+        @Results（{@Result（），@Result（）}）或@Results（@Result（））
+
+    @Resutl 注解
+        代替了 <id>标签和<result>标签
+
+    @Result 中 属性介绍：
+        id 是否是主键字段
+        column 数据库的列名
+        property 需要装配的属性名
+        one 需要使用的@One 注解（@Result（one=@One）（）））
+        many 需要使用的@Many 注解（@Result（many=@many）（）））
+
+    @One 注解（一对一）
+        代替了<assocation>标签，是多表查询的关键，在注解中用来指定子查询返回单一对象。
+    @One 注解属性介绍：
+        select 指定用来多表查询的 sqlmapper
+        fetchType 会覆盖全局的配置参数 lazyLoadingEnabled。。
+        使用格式：
+            @Result(column=" ",property="",one=@One(select=""))
+
+    @Many 注解（多对一）
+        代替了<Collection>标签,是是多表查询的关键，在注解中用来指定子查询返回对象集合。
+        注意：聚集元素用来处理“一对多”的关系。需要指定映射的 Java 实体类的属性，属性的 javaType
+        （一般为 ArrayList）但是注解中可以不定义；
+        使用格式：
+            @Result(property="",column="",many=@Many(select=""))
+
+
+
+    注解开发中开启二级缓存
+        <!-- 配置二级缓存 -->
+        <settings>
+        <!-- 开启二级缓存的支持 -->
+        <setting name="cacheEnabled" value="true"/>
+        </settings>
+
+        在持久层接口中使用注解配置二级缓存
+        /**
+        *
+        * <p>Title: IUserDao</p>
+        * <p>Description: 用户的持久层接口</p>
+        * <p>Company: http://www.itheima.com/ </p>
+        */
+            @CacheNamespace(blocking=true)//mybatis 基于注解方式实现配置二级缓存
+            public interface IUserDao {}
