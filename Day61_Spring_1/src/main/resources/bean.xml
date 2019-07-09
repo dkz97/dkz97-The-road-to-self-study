@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 把创建对象 交给spring来管理
+        创建方式一:
+            直接创建，默认使用空构造方法
+    -->
+    <bean id="UserService" class="dkz97.springCase.service.impl.UserServiceImpl" scope="prototype"></bean>
+
+
+    <!-- 创建方式二:
+        使用类中的方法 返回对象
+     -->
+    <bean id="getService" factory-bean="UserService" factory-method="getBean"></bean>
+
+    <!-- 创建方式三:
+        使用工厂类中的静态方法
+        -->
+    <bean id="getServiceStatic" class="dkz97.springCase.staticfactory" factory-method="getServiceStatic"></bean>
+
+
+
+    <!-- 测试构造函数方法注入 -->
+    <bean id="ServiceDemo" class="dkz97.springCase.service.impl.ServiceDemo">
+        <constructor-arg name="age" value="18"></constructor-arg>
+        <constructor-arg name="username" value="大傻"></constructor-arg>
+        <constructor-arg name="birthday" ref="now"></constructor-arg>
+    </bean>
+    <!-- 配置一个日期对象 -->
+    <bean id="now" class="java.util.Date"></bean>
+
+
+    <!-- 使用set构造函数方法注入 -->
+    <bean id="ServiceDemo02" class="dkz97.springCase.service.impl.ServiceDemo02">
+        <property name="age" value="18"></property>
+        <property name="username" value="张三"></property>
+        <property name="birthday" ref="now"></property>
+    </bean>
+
+
+
+    <!-- 演示复杂数据/集合类型的注入
+        用于给list结构集合注入的标签
+            list array set
+        用于给map结构集合注入的标签
+            props map
+        结构相同标签可以互换
+    -->
+    <bean id="ServiceDemo03" class="dkz97.springCase.service.impl.ServiceDemo03">
+        <property name="strings">
+            <list>
+                <value>str1</value>
+                <value>str2</value>
+                <value>数组的注入</value>
+            </list>
+        </property>
+        <property name="list">
+            <list>
+                <value>list1</value>
+                <value>list2</value>
+                <value>list集合的注入</value>
+            </list>
+        </property>
+        <property name="set">
+            <list>
+                <value>set1</value>
+                <value>set2</value>
+                <value>set集合的注入</value>
+            </list>
+        </property>
+
+        <property name="map">
+            <map>
+                <entry key="map1" value="map1"></entry>
+                <entry key="map2" value="map2"></entry>
+                <entry key="使用的是entry标签" value="map1"></entry>
+            </map>
+        </property>
+        <property name="properties">
+            <props>
+                <prop key="prop">pro1</prop>
+                <prop key="prop">pro2</prop>
+            </props>
+        </property>
+
+    </bean>
+
+</beans>
