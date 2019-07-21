@@ -1,0 +1,170 @@
+1.Spring的IOC的常用注解
+2.案例使用xml方式的注解的方式实现CRUD的操作
+        持久层技术:dbutils
+3.改造注解ioc案例，使用注解方式实现
+4.spring和junit整合
+
+
+
+
+
+
+一.Spring的常用注解
+
+
+    bean.xml的环境搭建:
+        直接在spring 官网中找到xml的头文件然后加载进去:
+            主要是: xmlns:context
+        加入标签,告知创建容器的时候，应该扫描哪个包下面的文件的注解
+        <context:component-scan base-package="dkz97"></context:component-scan>
+
+
+
+    曾经的xml配置:
+    <bean id="" class="" scope=""  init-method="" destroy-method="" >
+        <property name="" value="" / ref=""> </property>
+    </bean>
+
+
+    1.用于创建对象
+        作用和xml中的<bean>标签实现的功能是一样的:
+
+        @Component:
+            作用: 把类的对象传入ioc容器中
+            value: 指定bean的id，默认值是当前的类名 首字母改小写
+
+        @Controller: 一般用于表现层
+        @Service:    一般用于业务层
+        @Repository: 一般用于持久层
+        上面的三个注解的属性和Component 一模一样的
+            只是为了让人可以更好的看出来整体的，让三层的对象更加清晰
+
+
+
+    2.用于注入数据
+        作用和xml中<bean>标签内的，<property>标签的作用一样
+
+        @Autowired:
+            作用:自动按照类型注入, 只要ioc容器里面有唯一的bean对象类型和要注入的变量的类型相同，就可以直接在容器里面直接注入到里面
+                注意:
+                    如果ioc容器中，没有变量所需求的bean类型对象的话，就会报错
+                    如果Ioc容器中，有多个类型都是相同的时候，则找id，如果和变量名称相同的话，则按照名称
+                出现位置:
+                    可以是变量上，也可以是方法上
+                细节:
+                    在使用注解的时候，set方法就不是必须的了
+
+        @Qualifier:
+            作用:按照类中注入的基础智商再按照名称注入，就是需要先有Autowired，然后再在这个按照类的基础上，在按照名注入对象，但是给方法参数注入的话可以直接注入
+            属性：
+                value: 指定bean的id
+
+        @Resource
+            作用: 直接按照bean的id注入，可以独立使用
+            属性:
+                name: 用于指定bean的id
+
+            注意:
+                上面三个注解只能通过其他bean类型的数据,而基本类型和string类型无法使用上述注解实现.
+                另外，集合类型只能用xml配置实现
+
+        @Value
+            作用: 用于注入基本类型和String类型
+            属性:
+                value: 用于指定数据的值，可以使用spring中的SpEL(Spring中的el表达式)
+                    SpEl的写法:${表达式}
+
+    3.用于改变作用范围
+        作用和<bean>标签内的 scope: 属性一样
+
+        @Scope
+            作用: 用于指定bean的作用范围
+            属性:
+                value : 指定范围的取值，常用取值, singleton prototype
+
+
+    4.和生命周期相关
+        作用和<bean>标签中的init-method 和 destroy-method的作用是一样的
+
+        PreDestroy
+            作用: 用于指定销毁的方法
+        PostConstruct
+            作用: 用于指定开启的方法
+
+
+
+
+二.Spring中注解和xml配置的选择
+    注解的优势: 配置简单，维护方便，(找到类就找到对应的位置)
+
+    xml的优势: 不用修改源码，不涉及重新部署和编译
+
+
+
+三.Spring中的新注解
+
+    需要改造的问题: 虽然是用的注解配置，但是xml还是在，所以呢需要改造，全部完全使用注解配置
+
+
+    创建一个配置类，加上注解，使用的作用和bean.xml中一样;
+
+
+    主要使用的是：
+        AnnotationConfigApplicationContext( 配置类的字节码 ) 来创建容器对象，并且这个实体类的构造方法会自动给写入的参数加上Configuration注解
+
+
+    @Configuration:
+        作用，指定当前的类是一个配置类
+
+    @ComponentScan:
+        作用: 通过注解，指定spring在创建容器中要扫描的包
+
+        属性:
+            value: 和beanPackages 作用一样，指定需要扫描的包
+
+
+    @Bean
+        作用: 把当前方法的返回值，作为对象，传入到spring的ioc容器中
+
+        属性:
+            name: 用于指定bean的id，不写的时候，默认是当前方法的名称
+
+        细节:
+            当注解的方法中，需要参数，spring会自动在ioc容器中寻找有没有可用的bean对象,查找的方式和Autowired注解作用一样
+
+
+    @Import
+        作用: 用于导入其他的配置类，这样，引入的配置类中就不用写@Configuration 注解了
+
+        属性:
+            value[]: 写入其他配置类的字节码
+
+        细节:
+            当使用Import的时候，有import注解的时候父配置类，导入的都是子配置类
+
+
+    @PropertySource
+        作用: 用于加载properties配置文件，
+
+        属性:
+            value[]: 指定properties文件的位置，如果是在类路径下，就要加上classpath
+
+
+四.Spring中整合junit
+
+    要先在junit的测试类中进行注解配置，注解写完之后，就可以使用@Autowired 中进行自动注入
+
+    @RunWith( SpringJUnit4ClassRunner.class )
+        这个注解可以把junit原有的main方法替换成spring的
+
+    @ContextConfiguration()
+
+        属性：
+            locations:
+                用于指定配置文件的位置。如果是类路径下，需要用 classpath:表明
+
+            classes:
+                用于指定注解的类。当不使用 xml 配置时，需要用此属性指定注解类的位置。
+
+
+
