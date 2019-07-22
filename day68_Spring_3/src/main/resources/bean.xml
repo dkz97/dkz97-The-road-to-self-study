@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 配置account proxy 动态代理配置-->
+    <bean id="accountServiceProxy" class="dkz97.service.proxy.AccountServiceProxy">
+        <property name="transactionManager" ref="transactionManger"></property>
+        <property name="accountService" ref="accountService"></property>
+    </bean>
+
+    <!-- 配置代理对象service 使用的配置是方法获取对象 -->
+    <bean id="ProxyAccountService" factory-bean="accountServiceProxy" factory-method="getAccountService"></bean>
+
+    <!-- 配置service -->
+    <bean id="accountService" class="dkz97.service.impl.AccountServiceImpl">
+        <!-- 注入dao对象-->
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+
+    <!-- 配置dao -->
+    <bean id="accountDao" class="dkz97.dao.impl.AccountDaoImpl">
+        <!-- 注入queryRunner对象-->
+        <property name="runner" ref="queryRunner"></property>
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <!-- 配置queryRunner对象-->
+    <bean id="queryRunner" class="org.apache.commons.dbutils.QueryRunner">
+    </bean>
+
+    <!-- 配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 连接数据库的四大信息-->
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/day60?characterEncoding=utf-8"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="pzr980716"></property>
+    </bean>
+
+
+    <!-- 配置线程连接的对象 -->
+    <bean id="connectionUtils" class="dkz97.utils.ConnectionUtils">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置事务管理对象 -->
+    <bean id="transactionManger" class="dkz97.utils.TransactionManager">
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+</beans>

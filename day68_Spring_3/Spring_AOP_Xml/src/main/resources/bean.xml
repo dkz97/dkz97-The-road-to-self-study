@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 把service存入容器中-->
+    <bean id="accountService" class="dkz97.service.impl.AccountService"></bean>
+
+    <!-- 配置通知bean-->
+    <bean id="logger" class="dkz97.utils.Logger"></bean>
+
+    <!-- 开始aop配置-->
+    <aop:config>
+
+        <!-- 用于抽取出切入点表达式（切入点表达式就是找到切入点的方法所在位置）-->
+        <aop:pointcut id="pt1" expression="execution(* dkz97.service.impl.AccountService.*(..))"/>
+
+        <!-- 开始其中一个切面配置-->
+        <aop:aspect id="logAdvice" ref="logger">
+
+            <!-- 开始进行通知类型配置-->
+            <aop:before method="printLog" pointcut-ref="pt1"></aop:before>
+
+
+            <!-- 配置环绕通知-->
+            <aop:around method="aroundPrintLog" pointcut-ref="pt1"></aop:around>
+        </aop:aspect>
+
+
+    </aop:config>
+</beans>
