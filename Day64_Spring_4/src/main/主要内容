@@ -1,0 +1,162 @@
+1. spring中的JdbcTemplate操作
+2. 对操作数据库的类，配置Aop事务
+3. spring中的事务控制
+
+
+
+
+一.回顾SpringJdbc技术
+
+    1. 配置DataSource,使用new DriverMangerDataSource(),然后使用set方法，配置数据源
+    2. 创建jdbcTemplate对象，直接 new JdbcTemplate( DateSource)
+    3. 查询方法 query (三个参数，第一个参数sql语句，第二个参数 new BeanPropertyRowMapper<>(), 第三个参数 args)
+       删除、更新、增加的方法 update
+
+二.
+    练习，操作数据库配置aop事务控制
+
+        主要是bean.xml中的配置，aop的几个标签
+            <aop:config>: 用于开始配置aop
+            <aop:aspect>: 开始配置切面
+                <aop:before> .... 各种开始配置通知
+
+        配置:
+                <aop:aspectj-autoproxy  proxy-target-class="true"/>  标示开始aop配置
+
+
+三.Spring中的事务控制
+
+
+    1.基本概念
+        a.JavaEE 体系进行分层开发，事务处理位于业务层，Spring 提供了分层设计业务层的事务处理解决方案。
+
+        b.spring 框架为我们提供了一组事务控制的接口。具体在后面的第二小节介绍。这组接口是在spring-tx-5.0.2.RELEASE.jar 中。
+
+        c.spring 的事务控制都是基于 AOP 的，它既可以使用编程的方式实现，也可以使用配置的方式实现。我们学习的重点是使用配置的方式实现。
+
+
+
+    2. 声明式的事务控制
+
+        接口： PlatformTransactionManager Spring的事务管理器
+
+            具体有三个操作方法:
+                1. 获取事务状态信息
+                    TransactionStatus getTransaction(TransactionDefinition definition)
+                2. 提交事务
+                    void commit(TransactionStatus status)
+                3. 回滚事务
+                    void rollback(TransactionStatus status)
+
+        真正管理事务的对象
+
+            org.springframework.jdbc.datasource.DataSourceTransactionManager 使用 SpringJDBC 或 iBatis 进行持久化数据时使用
+
+            org.springframework.orm.hibernate5.HibernateTransactionManager 使用Hibernate 版本进行持久化数据时使用
+
+
+        对象:
+
+            TransactionDefinition(这个对象是，事务的定义信息对象)
+                方法：
+                    1. 获取事务对象名称
+                        String getName()
+                    2. 获取事务的隔离级别
+                        int getIsolationLevel()
+                    3. 获取事务传播行为
+                        int getPropagationBehavior()
+                    4. 获取事务超时时间
+                        int getTime()
+                    5. 获取事务是否只读
+                        boolean isReadOnly()
+
+                各个方法的东西解释:
+                    1.事务的隔离级别
+                        4个隔离级别，属性可以有5个，有一个是Isolation-Default，就是默认使用数据库的隔离级别
+
+                    2.事务的传播行为
+                        1.required:如果当前没有事务，就新建一个事务，如果已经存在一个事务中，加入到这个事务中。一般的选择（默认值）
+
+                        2.supports:支持当前事务，如果当前没有事务，就以非事务方式执行（没有事务）
+
+                        3.mandatory：使用当前的事务，如果当前没有事务，就抛出异常
+
+                        4.requers_new:新建事务，如果当前在事务中，把当前事务挂起。
+
+                        5.not_supported:以非事务方式执行操作，如果当前存在事务，就把当前事务挂起
+
+                        6.never:以非事务方式运行，如果当前存在事务，抛出异常
+
+                        7.nested:如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则执行 REQUIRED 类似的操作。
+
+                    3.超时时间
+                        默认为-1，就是没有超时时间，如果需要就自己设置，单位为秒
+
+                    4.是否为只读
+                        建议查询就设置为只读
+
+
+            TransactionStatus (事务具体的运行状态)
+
+                方法:
+                    1.刷新事务:
+                        void flush()
+
+                    2.获取是否存在存储点
+                        boolean hasSavepoint()
+
+                    3.获取事务是否完成
+                        boolean isCompleted()
+
+                    4.获取事务是否为新的事务
+                        boolean isNewTransaction()
+
+                    5.获取事务是否回滚
+                        boolean isRollbackOnly()
+
+                    6.设置事务回滚
+                        void setRollbackOnly()
+
+
+四.基于xml的声明式事务控制
+
+
+    基于xml的声明式事务控制的话，主要是靠那个事务管理器，事务管理器里面封装了事务的各种方法，只需要配置 事务通知和切入点表达式配合就行了
+
+    1. 先导入头文件，需要有tx的这个，并且jar包也要导入spring-tx，这样就可以用spring的事务管理了
+
+    2. 配置事务管理器的<bean> 配置哪个的话上面也有说，主要就是两个实体类
+        DataSourceTransactionManager
+        HibernateTransactionManager
+
+    3. 使用 <tx:advice id="" transaction-manager= ""> 配置事务通知
+        id = 这个事务通知的唯一标示
+        transaction-manager = 事务管理器
+
+        3.1
+            在配置事务通知之下，可以配置事务的属性
+                <tx:attributes> 主要是用于配置事务通知的属性
+                    <tx:method> 针对特定的方法进行配置，name = " 方法名称，可以是*通配符"
+                        然后有以下的属性:
+                            isolation: 指定事务的隔离级别
+                            propagation: 指定事务的传播行为，默认为required, 可以对查询设置supports(根据上面事务传播属性可看)
+                            read-only: 是否只读
+                            timeout: 指定事务超时时间
+                            rollback-for: 指定一个异常，只有这个异常的时候才回滚
+                            no-rollback-for: 指定一个异常，只有这个异常的时候才不回滚
+
+
+    4.配置好事务通知和事务管理器后，就可以使用aop配置
+        4.1 <aop:pointcut> 配置切入点表达式
+
+        4.2 <aop:advisor> 配置切入点表达式和事务通知结合
+
+
+五.基于注解的声明式事务控制
+
+    1.首先就是开启spring注解的支持，扫描配置spring注解要扫描的包
+    2. 配置spring的事务管理器
+    3. 开启spring 对事务注解的支持
+        <tx:annotation-driven transaction-manager="">
+    4. 在需要用到事务管理的地方加上 @Transactional (里面的value就是配置事务通知属性)
+
