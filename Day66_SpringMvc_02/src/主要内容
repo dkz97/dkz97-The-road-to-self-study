@@ -1,0 +1,202 @@
+1.响应数据的返回值分类
+2.SpringMvc提供的重定向和转发
+3.响应回Json数据
+4.SpringMvc实现上传文件
+5.SpringMvc异常处理
+6.SpringMvc的拦截器
+
+
+
+一.响应数据的返回值分类
+
+    1.响应数据返回类型为 String
+
+        当浏览器发送请求，通过Controller，会解析url，然后根据RequestMapper 中找到方法，然后执行方法
+            如果方法中返回值为String，然后返回会通过视图解析器，然后根据目录，根据后缀名进行拼接，通过视图解析给到浏览器
+            注意: 但是浏览器的路径，还是请求访问的时候的那个路径
+
+        如果视图解析器的配置是如下的话
+        <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                <!-- 配置前缀和后缀-->
+                <property name="prefix" value="/WEB-INF/pages/"></property>
+                <property name="suffix" value=".jsp"></property>
+        </bean>
+
+            解析过后的jsp物理路径为  /WEB-INF/pages/success.jsp
+
+        返回的string， 就会根据前缀的目录，和后缀.jsp进行拼接，然后将jsp页面视图展示出来，当然路径还是访问路径，这个是物理路径
+
+
+    2.响应数据的返回类型为void
+
+        1.如果没其他东西，默认返回给视图解析器，用方法名称进行配置的拼接查找
+
+        2.使用request中的转发， 需要加上目录路径才行，然后呢转发需要给request和response
+
+        3.使用response的重定向，需要加上全路径才行(并且不能使用WEB-INF下面的)
+
+        3.使用response的writer 指定响应结果，可以响应json数据(注意直接响应结果的话需要设置响应的编码，防止中文乱码)
+
+
+    3.返回值是ModelAndView
+
+        ModelAndView对象是SpringMvc提供的一个对象，可以作为控制器的返回值
+
+            两个方法:
+                1.addObject(key,value)  把map集合添加到request对象中，然后进行存储
+                2.setViewName() 类似于返回String值，给视图解析器进行解析拼接路径
+
+
+
+二.SpringMvc中的转发和重定向
+
+    基于在Controller的返回值是String只上，并且要知道，转发和重定向都是不走视图解析器的
+
+    return "forward: xxx"
+        这个就是转发
+
+    return "redirect: xxx"
+        这个就是重定向
+
+
+
+三.Response 响应json数据
+
+    1.由于spirngMvc的核心处理器什么东西都经过，所以我们需要先屏蔽 静态资源，然后静态资源就可以不拦截，在Springmvc.xml使用标签
+
+        <mvc:resources>
+
+    2.导入Jackson的jar包
+        使用@ResponseBody注解，会将controller方法返回的对象直接转为json数据
+
+    3. 在请求页面中可以设置，ajax异步传输，给一个按钮设置单击事件就可以了，$.ajax({}) 进行请求头的设置
+
+    4. 在controller控制器中，可以使用RequestBody接收请求体，返回值可以加上
+        @ResponseBody 意思就是返回的是json数据
+
+
+四.SpringMvc可以实现文件
+
+    1.文件传输的必要前提:
+        form 表单的 enctype 取值必须是：multipart/form-data
+            (默认值是:application/x-www-form-urlencoded)
+                enctype:是表单请求正文的类型
+
+        method 属性取值必须是 Post
+
+        提供一个文件选择域<input type=”file” />
+
+    2.文件上传的原理
+        1.获取一个文件夹的真实路径，然后看看这个文件夹是否存在，不存在就创建
+
+
+        2.判断请求体的内容是否是文件内容，如果是文件内容的话，就用File这个对象，在文件夹中，根绝请求体使用io来创建这个文件，这个时候文件就上传成功
+            需要借助Commons-fileupload 组件来判断是否是文件
+
+    3.传统文件上传案例:
+
+        文件上传需要用到jar包。commons-fileupload 和 commons-io
+        1. 使用request.getSession.getServletContext.getRealPath 获取网站的物理路径
+
+        2. 使用DiskFileItemFactory  这个工厂类，可以将请求体的各个项目进行分类
+
+        3. 使用new ServletFileUpload(factory) 将工厂传入，等下可以去请求体的文件进行操作
+
+        4. 方法 List<FileItem> paresRequest()  将请求体的各个项目返回在集合中
+
+        5. 遍历列表，判断当前项目是否为文件还是普通的表单项，如果是文件的话就使用 item.write(File) 可以传入文件对象，进行在本地创建文件
+
+        注意:
+            主要就是理解文件夹的创建，还有使用两个对象，来对请求体进行解析，是文件的请求的话就可以在本地创建文件了
+
+
+
+
+    4.SpringMvc的文件上传案例
+
+        主要SpringMvc中有一个文件解析器，可以省略传统的一个步骤(判断请求体是否是文件)
+            解析了之后的东西全都是文件项，然后通过文件项就可以直接把文件传给Controller中使用方法并且保存在内地中了
+
+        1. 首先需要配置SpringMvc的文件上传的文件解析器在springmvc.xml中
+            <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+            id只能是这个，class，类主要是CommonsMultipartResolver 文件解析器
+
+        2. 在类中 接收MultipartFile 参数，命名一定要和上传文件的name值一样
+
+        3. 然后由于文件解析器已经将文件项抽离出来，所以可以使用MultipartFile对象的方法
+                String getOriginalFilename() 获取文件的名称
+                void  transferTo(File) 传入File,将文件写入在本地中
+
+
+    5.SpringMvc的跨服务器上传文件
+
+        将文件上传到别的服务器中
+
+        1.需要用到之前两个commons包，还要导入两个新的包，jersey,主要是用于跨服务器的文件上传的
+
+        2.由于是跨服务器的，所以文件夹的创建就不用了， 然后需要的上传文件到的路径，需要手动写全路径
+            例: http://localhost:8080/uploads/
+
+        3.获取上传文件的名称 以及用uuid给定唯一名称
+
+        4. 使用Client 这个对象，Client.create() 创建客户端对象
+
+        5. 使用方法，WebResource resource(path+filename) 这个方法，传入路径，指定上传文件web路径
+
+        6. 然后使用put()方法，把MultipartFile的字节数组传入，然后就好了
+
+
+        注意:
+            上传文件到其他服务器其实挺简单，首先需要设置需要上传的路径，然后就是springmvc可以使用MultipartFile来获取文件名称
+                然后就是使用jersey的Client对象， 方法resource可以绑定上传文件路径，然后使用put()方法就可以上传文件并且下载到本地
+
+
+五.SpringMVc的异常处理
+
+    主要就是，如果遇到异常的时候，不会直接抛出到界面上给客户端看到，而是进行一个异常处理器，把处理过的异常给客户看
+
+    1.自定义一个异常类( 要继承Exception)
+
+    2.然后在模拟异常的时候，try catch ,在catch 中，抛出一个自定义的异常类 throw new 自定义类并且传入信息
+
+    3.创建一个异常控制器， 需要实现HandlerExceptionResolver ，重写方法resolverException
+
+    4.在springmvc.xml中 配置异常控制器对象
+
+    5.在重写的方法中，Exception 就是遇到的错误信息
+        然后可以进行判断，如果遇到的错误信息是 自定义的错误信息的话，就直接强转换类型
+        如果不是自定义的错误信息，就新建一个自定义错误信息并且传入想要客户看到的话
+
+        然后返回值是ModelAndView类型，就可以新建一个ModelAndView对象，然后传入键值对，然后通过serViewName 可以跳转到其他视图
+
+    6.然后其他视图就可以在request中获取错误信息展示给客户端看
+
+
+    注意: 主要思路就是，自定义的一个异常类，可以自行写一些错误信息给客户看， 主要控制在 异常控制器(需要继承HandlerExceptionResolver)
+        然后，每当程序遇到异常的时候，都会经过 我们自己写的异常控制器中，然后可以通过异常控制器，对异常信息进行操作，然后通过
+            ModelAndView对象来进行视图的转发，就可以了
+
+
+六.SpringMvc的拦截器
+
+    类似于 Servlet中的Filter ，请求前的拦截，和响应后的拦截，但是SpringMvc的拦截器，不会拦截静态资源
+
+    1.自定义一个拦截器  需要实现 HandlerInterceptor 这个类， 然后可以重写三个方法
+        boolean preHandle() 主要是在请求的时候拦截
+            返回值为true的时候，就是放行，可以执行下一个Controller的方法
+
+            false 就是不放行
+                如果不放行，可以使用重定向，或者转发来跳转到其他页面
+
+        void postHandle() 主要是在请求之后，响应之前拦截
+        afterCompletion() 主要是页面加载完毕后进行做事情
+
+    2.需要在springmvc.xml中 配置拦截器，把拦截器加进去
+        <mvc:Interceptors>
+            <mvc:interceptor>
+                <mvc:mapping path="/**"/>  配置的是拦截路径
+                <bean id="myInterceptor" class="dkz97.interceptor.MyInterceptor"></bean>
+            </mvc:interceptor>
+        </mvc:interceptors>
+
+    3.如果两个拦截器的话，就根据配置的前后来进行执行的前后顺序
