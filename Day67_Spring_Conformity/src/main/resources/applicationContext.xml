@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <!-- 这个xml主要是Springioc的xml-->
+
+    <!-- 开启注解要扫描的包-->
+    <context:component-scan base-package="dkz97">
+        <!-- 表明扫包的规则，不扫描那些@controller的类,Controller的类就由springmvc去负责-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!-- Spring框架整合mybatis 主要是连接池，SqlsessionFactory工厂类，映射扫描要配置去的路径-->
+    <!-- 配置连接池，主要使用的是c3p0的连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/day67?characterEncoding=utf-8"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="pzr980716"></property>
+    </bean>
+
+    <!-- 配置SqlSessionFactory工厂类，这样的话就有这个对象，然后可以创建Dao代理对象，要传入dataSource连接池-->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 要配置，映射扫描要去的包路径-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="dkz97/dao"></property>
+    </bean>
+
+    <!-- spring框架声明式事务的配置流程-->
+    <!-- 配置spring事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 配置事务通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!-- 配置事务的属性-->
+        <tx:attributes>
+            <!-- 配置有哪些方法要通过这个事务属性-->
+            <tx:method name="find*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="*" read-only="false" propagation="REQUIRED"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 配置AOP增强,就是哪些切入点需要用到这个事务通知-->
+    <aop:config>
+        <aop:pointcut id="pt1" expression="execution(* dkz97.service.impl.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pt1"></aop:advisor>
+    </aop:config>
+
+
+<!--    &lt;!&ndash; 使用spring的声明式事务管理，配置开启注解&ndash;&gt;-->
+<!--    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>-->
+</beans>

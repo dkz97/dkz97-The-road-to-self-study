@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 这个是一个AccountDao的一个反射文件，需要包名相同-->
+<mapper namespace="dkz97.dao.IAccountDao">
+
+    <select id="findAll" resultType="dkz97.domain.Account">
+        SELECT * FROM account;
+    </select>
+
+
+    <select id="saveAccount" parameterType="dkz97.domain.Account">
+        INSERT into account(name,money) values(#{name},#{money})
+    </select>
+
+    <select id="findByName" parameterType="String" resultType="dkz97.domain.Account">
+        SELECT * FROm account WHERE name = #{name};
+    </select>
+
+    <select id="updateAccount" parameterType="dkz97.domain.Account">
+        update account set name = #{name}, money = #{money} WHERE id = #{id};
+    </select>
+</mapper>
